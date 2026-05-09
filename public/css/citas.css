@@ -1,0 +1,298 @@
+/* =========================
+   Base (calma / azul suave)
+   ========================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root{
+  --blue-50:  #eef4ff;
+  --blue-100: #eaf0ff;
+  --blue-200: #dbe7ff;
+  --blue-500: #4f7cff;
+  --blue-700: #2f4db6;
+
+  --text-900: #111827;
+  --text-700: #374151;
+  --text-500: #6b7280;
+
+  --border: #e5e7eb;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  --radius: 16px;
+}
+
+html { font-size: 16px; }
+
+body{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  color: var(--text-900);
+  line-height: 1.5;
+  background:
+    radial-gradient(1200px 600px at 50% 10%, rgba(79,124,255,0.18), transparent 60%),
+    #f3f4f6;
+}
+
+/* =========================
+   Header
+   ========================= */
+.header{
+  background: var(--blue-100);
+  border-bottom: 1px solid var(--blue-200);
+}
+
+.header__container{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-900);
+}
+
+.brand__icon{
+  font-size: 22px;
+  line-height: 1;
+  color: var(--blue-700);
+}
+
+.brand__title{
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.header__actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header__link{
+  text-decoration: none;
+  color: var(--blue-700);
+  font-weight: 650;
+}
+
+.header__link:hover{
+  text-decoration: underline;
+}
+
+.header__button{
+  text-decoration: none;
+  background: var(--blue-500);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 750;
+}
+
+.header__button:hover{
+  background: #446de6;
+}
+
+/* =========================
+   Main / Containers
+   ========================= */
+.main{
+  background: transparent;
+}
+
+.main__container{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 24px 48px;
+}
+
+.hero{
+  height: 95px;
+  background: linear-gradient(
+    180deg,
+    rgba(79,124,255,0.18),
+    rgba(79,124,255,0.08)
+  );
+  border-radius: var(--radius);
+  margin: 20px 0 28px;
+  border: 1px solid rgba(79,124,255,0.15);
+}
+
+/* =========================
+   Typography / Sections
+   ========================= */
+.content{
+  margin-bottom: 28px;
+}
+
+.title{
+  font-size: 1.35rem;
+  font-weight: 850;
+  margin-bottom: 12px;
+}
+
+/* =========================
+   Cards
+   ========================= */
+.card{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 18px;
+  box-shadow: var(--shadow);
+}
+
+.card__image{
+  height: 140px;
+  border-radius: 14px;
+  background: var(--blue-100);
+  margin-bottom: 14px;
+  border: 1px solid var(--blue-200);
+}
+
+.card__title{
+  font-size: 1.05rem;
+  font-weight: 850;
+  margin-bottom: 8px;
+  color: var(--text-900);
+}
+
+.card__description{
+  font-size: 0.95rem;
+  color: var(--text-700);
+  line-height: 1.45;
+}
+
+/* Hover suave opcional (si quieres sensación clic) */
+.card:hover{
+  box-shadow: 0 16px 32px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   Form
+   ========================= */
+.form{
+  margin-top: 10px;
+}
+
+.form__fieldset{
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: rgba(255,255,255,0.6);
+}
+
+.form__legend{
+  padding: 0 8px;
+  font-size: 0.85rem;
+  color: var(--text-500);
+}
+
+.form__group{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.form__label{
+  font-size: 0.92rem;
+  font-weight: 650;
+  color: var(--text-700);
+}
+
+.form__input{
+  padding: 10px 12px;
+  font-size: 0.95rem;
+  border-radius: 12px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  background: #fff;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form__input:focus{
+  border-color: var(--blue-500);
+  box-shadow: 0 0 0 3px rgba(79,124,255,0.20);
+}
+
+textarea.form__input{
+  resize: vertical;
+  min-height: 110px;
+}
+
+/* =========================
+   Buttons
+   ========================= */
+.button{
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-size: 1rem;
+  font-weight: 800;
+  background: var(--blue-500);
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.05s, opacity 0.2s, background-color 0.2s;
+}
+
+.button:hover{
+  background: #446de6;
+}
+
+.button:active{
+  transform: scale(0.99);
+}
+
+/* Botón secundario (Cancelar cita) */
+.button--secondary{
+  margin-top: 12px;
+  width: 100%;
+  background: var(--blue-100);
+  color: var(--blue-700);
+  border: 1px solid var(--blue-200);
+  font-weight: 750;
+}
+
+.button--secondary:hover{
+  background: #dde7ff;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+@media (max-width: 1024px){
+  .main__container,
+  .header__container{
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+@media (max-width: 640px){
+  .header__container{
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .header__actions{
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .hero{
+    height: 80px;
+    margin: 16px 0 22px;
+  }
+}

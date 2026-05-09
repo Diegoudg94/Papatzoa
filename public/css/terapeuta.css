@@ -1,0 +1,594 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root{
+  --blue-50:  #eef4ff;
+  --blue-100: #eaf0ff;
+  --blue-200: #dbe7ff;
+  --blue-500: #4f7cff;
+  --blue-700: #2f4db6;
+
+  --text-900: #111827;
+  --text-700: #374151;
+  --text-500: #6b7280;
+
+  --border: #e5e7eb;
+  --shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+  --radius: 16px;
+}
+
+html { font-size: 16px; }
+
+body{
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, sans-serif;
+  color: var(--text-900);
+  line-height: 1.5;
+  background:
+    radial-gradient(1200px 600px at 50% 10%, rgba(79,124,255,0.18), transparent 60%),
+    #f3f4f6;
+}
+
+/* =========================
+   Header
+   ========================= */
+.header{
+  background: var(--blue-100);
+  border-bottom: 1px solid var(--blue-200);
+}
+
+.header__container{
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 18px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+  color: var(--text-900);
+}
+
+.brand__icon{
+  font-size: 22px;
+  line-height: 1;
+  color: var(--blue-700);
+}
+
+.brand__title{
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.header__actions{
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.header__link{
+  text-decoration: none;
+  color: var(--blue-700);
+  font-weight: 650;
+}
+
+.header__link:hover{
+  text-decoration: underline;
+}
+
+.header__button{
+  text-decoration: none;
+  background: var(--blue-500);
+  color: #fff;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-weight: 750;
+}
+
+.header__button:hover{
+  background: #446de6;
+}
+
+/* =========================
+   Tabla terapeuta
+   ========================= */
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+  background: #ffffff;
+}
+
+.table thead th {
+  text-align: left;
+  padding: 12px 14px;
+  font-weight: 700;
+  color: #1f2937;
+  border-bottom: 2px solid #e5e7eb;
+  background: #f5f8ff;
+}
+
+.table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  vertical-align: top;
+}
+
+.table tbody tr:hover {
+  background: #f0f5ff;
+}
+
+/* Link dentro de tabla */
+.table__link {
+  color: #2f4db6;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.table__link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive: compactar texto largo */
+@media (max-width: 640px) {
+  .table {
+    font-size: 0.9rem;
+  }
+
+  .table thead {
+    display: none;
+  }
+
+  .table tbody tr {
+    display: block;
+    margin-bottom: 16px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 12px;
+  }
+
+  .table tbody td {
+    display: flex;
+    justify-content: space-between;
+    border: none;
+    padding: 6px 0;
+  }
+
+  .table tbody td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #111827;
+  }
+}
+/* =========================
+   Acciones (Aceptar / Rechazar / Comentario)
+   ========================= */
+
+.actions {
+  display: grid;
+  gap: 10px;
+}
+
+.btn {
+  border: 1px solid transparent;
+  border-radius: 10px;
+  padding: 10px 12px;
+  font-weight: 800;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.btn--accept {
+  background: #e8fff3;
+  color: #0f5132;
+  border-color: #c7f2dc;
+}
+
+.btn--accept:hover {
+  background: #d9ffea;
+}
+
+.btn--reject {
+  background: #ffecec;
+  color: #842029;
+  border-color: #f5c2c7;
+}
+
+.btn--reject:hover {
+  background: #ffe0e0;
+}
+
+.comment {
+  display: grid;
+  gap: 8px;
+}
+
+.comment__input {
+  width: 100%;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.comment__input:focus {
+  border-color: #4f7cff;
+  box-shadow: 0 0 0 3px rgba(79,124,255,0.20);
+}
+
+.btn--comment {
+  background: #eaf0ff;
+  color: #2f4db6;
+  border-color: #dbe7ff;
+}
+
+.btn--comment:hover {
+  background: #dde7ff;
+}
+
+/* Responsive: que acciones no se aprieten */
+@media (max-width: 640px) {
+  .actions {
+    gap: 12px;
+  }
+}
+.card__description a.table__link {
+  margin-left: 10px;
+}
+
+/* =========================
+   Notas del terapeuta
+   ========================= */
+
+.patient-name{
+  color: #2f4db6;
+  font-weight: 900;
+}
+
+.note{
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 12px;
+  background: #ffffff;
+}
+
+.note__meta{
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.note__text{
+  color: #374151;
+}
+
+/* =========================
+   UX general expediente
+   ========================= */
+.content {
+  margin: 18px 0;
+}
+
+.title {
+  font-size: 1.6rem;
+  margin: 0 0 12px;
+}
+
+.card {
+  padding: 18px;
+  border-radius: 16px;
+}
+
+.card__title {
+  margin: 0 0 10px;
+}
+
+.card__description {
+  margin: 0;
+  color: #374151;
+  line-height: 1.55;
+}
+
+/* =========================
+   Tabs
+   ========================= */
+.tabs {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.tab {
+  border: 1px solid #dbe7ff;
+  background: #f5f8ff;
+  color: #2f4db6;
+  font-weight: 800;
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.tab:hover {
+  background: #eaf0ff;
+}
+
+.tab.is-active {
+  background: #4f7cff;
+  border-color: #4f7cff;
+  color: #fff;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+/* =========================
+   Tablas: mejor look
+   ========================= */
+.table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 680px; /* evita que todo se aplaste */
+}
+
+.table thead th {
+  background: #f5f8ff;
+  color: #111827;
+  font-weight: 900;
+  padding: 12px 14px;
+  border-bottom: 2px solid #e5e7eb;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.table tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+}
+
+.table tbody tr:hover {
+  background: #f0f5ff;
+}
+
+/* =========================
+   Form / notas: que no se vea mini
+   ========================= */
+.form {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.form__group {
+  display: grid;
+  gap: 6px;
+}
+
+.form__label {
+  font-weight: 800;
+  color: #111827;
+}
+
+.form__input {
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 12px 12px;
+  outline: none;
+  font: inherit;
+  background: #fff;
+}
+
+textarea.form__input {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form__input:focus {
+  border-color: #4f7cff;
+  box-shadow: 0 0 0 3px rgba(79,124,255,0.20);
+}
+
+.button {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  border: none;
+  border-radius: 12px;
+  padding: 12px 14px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.notes {
+  margin-top: 16px;
+}
+
+.note {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 12px;
+  margin-top: 12px;
+  background: #ffffff;
+}
+
+.note__meta {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-weight: 900;
+  margin-bottom: 6px;
+}
+
+/* =========================
+   Responsive real (móvil)
+   ========================= */
+@media (max-width: 768px) {
+  .title { font-size: 1.35rem; }
+  .card { padding: 14px; }
+  .table { min-width: 620px; } /* scroll horizontal suave en móvil */
+}
+
+@media (max-width: 420px) {
+  .tabs { gap: 8px; }
+  .tab { padding: 9px 12px; font-size: 0.92rem; }
+}
+
+.header__center {
+  display: flex;
+  align-items: center;
+  gap: 18px; /* ajusta: 12, 16, 20... */
+}
+
+/* Puntaje salud mental */
+.score {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.9rem;
+  border: 1px solid #e5e7eb;
+}
+
+.score--low {
+  background: #fff1f2;
+  color: #9f1239;
+  border-color: #fecdd3;
+}
+
+.score--mid {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border-color: #bfdbfe;
+}
+
+.score--high {
+  background: #ecfdf5;
+  color: #047857;
+  border-color: #a7f3d0;
+}
+
+/* ================= PROGRESO DIARIO ================= */
+.progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.progress__step {
+  padding: 8px 14px;
+  border-radius: 20px;
+  background: #e6ecff;
+  color: #5a6fae;
+  font-weight: 600;
+  font-size: 14px;
+  white-space: nowrap;
+}
+
+.progress__step.is-active {
+  background: #4f6bed;
+  color: white;
+}
+
+.progress__step.is-done {
+  background: #cfe0ff;
+  color: #2f4cc8;
+}
+
+.progress__line {
+  flex: 1;
+  height: 2px;
+  background: #cfd8ff;
+}
+
+/* =========================
+   UX: Chips / opciones
+   ========================= */
+
+.choice {
+  margin-top: 14px;
+}
+
+.choice__title {
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+/* Contenedor de chips */
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Chip (botón) */
+.chip {
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.75);
+  padding: 10px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.06s ease, box-shadow 0.12s ease, border-color 0.12s ease;
+  user-select: none;
+}
+
+/* Hover / focus */
+.chip:hover {
+  transform: translateY(-1px);
+}
+.chip:focus {
+  outline: 2px solid rgba(80, 120, 255, 0.35);
+  outline-offset: 2px;
+}
+
+/* Seleccionado */
+.chip.is-selected {
+  border-color: rgba(80, 120, 255, 0.8);
+  box-shadow: 0 6px 18px rgba(80, 120, 255, 0.15);
+}
+
+/* Ocultar inputs reales pero mantenerlos accesibles */
+.sr-input {
+  position: absolute !important;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0);
+  white-space: nowrap; border: 0;
+}
+
+/* Responsive: chips un poquito más “tocables” */
+@media (max-width: 520px) {
+  .chip {
+    padding: 12px 14px;
+  }
+}

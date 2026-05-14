@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Expediente del paciente</title>
-  <link rel="stylesheet" href="terapeuta.css" />
+  <link rel="stylesheet" href="{{ asset('css/terapeuta.css') }}" />
 </head>
 <body>
 
@@ -34,7 +34,9 @@
       <section class="content">
         <h1 class="title">
           Paciente:
-          <span class="patient-name" id="patientName">Nombre del paciente</span>
+          <span class="patient-name">
+    {{ $paciente->nombre }} {{ $paciente->apellido }}
+</span>
         </h1>
 
         <p class="card__description">
@@ -134,10 +136,7 @@
 
   <script>
     /* ===== 1) Paciente dinámico ===== */
-    const params = new URLSearchParams(window.location.search);
-    const paciente = params.get('paciente') || 'Paciente (sin seleccionar)';
-    const patientNameEl = document.getElementById('patientName');
-    patientNameEl.textContent = paciente;
+    
 
     /* ===== 2) Data mock (sin backend) ===== */
     const MOCK = {
@@ -185,7 +184,7 @@
       },
     };
 
-    const data = MOCK[paciente] || { emociones: [], sesiones: [], notasIniciales: [] };
+    const data = MOCK["{{ $paciente->nombre }} {{ $paciente->apellido }}"]
 
     /* ===== 3) Render ===== */
     const emocionesBody = document.getElementById('emocionesBody');

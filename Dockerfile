@@ -1,4 +1,4 @@
-FROM php:8.3-cli
+FROM php:8.3-apache
 
 RUN apt-get update && apt-get install -y \
     unzip \
@@ -9,22 +9,32 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-WORKDIR /app
+WORKDIR /var/www/html
 
 COPY . .
 
 RUN composer install
 
-RUN touch database/database.sqlite
-
 RUN cp .env.example .env
+
+RUN touch database/database.sqlite
 
 RUN php artisan key:generate
 
 RUN php artisan migrate --force
 
-RUN chmod -R 775 storage bootstrap/cache public
+RUN chown -R www-data:www-data storage bootstrap/cache database
 
-EXPOSE 10000
+RUN a2enmod rewrite
 
-CMD ["sh", "-c", "php artisan serve --host=0.0.0.0 --port=10000"]
+ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
+
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/sites-available/*.conf
+
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+EXPOSE 80
+
+CMD ["apache2-foreground"]

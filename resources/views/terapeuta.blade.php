@@ -1,96 +1,213 @@
+@php
+    // Nota: Lo ideal es pasar $terapeuta desde el Controlador, 
+    // pero mantenemos tu lógica funcional.
+    $usuarioId = session('usuario_id');
+    $terapeuta = $usuarioId
+        ? \Illuminate\Support\Facades\DB::table('users')
+            ->where('id', $usuarioId)
+            ->first()
+        : null;
+@endphp
+
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vista terapeuta</title>
-  <link rel="stylesheet" href="terapeuta.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Panel del terapeuta</title>
+    <link rel="stylesheet" href="{{ asset('css/terapeuta.css') }}" />
 </head>
+
 <body>
 
-  <header class="header">
-    <div class="header__container">
-      <a class="brand" href="dashboard.html">
-        <span class="brand__icon" aria-hidden="true">✳︎</span>
-        <span class="brand__title">Panel del terapeuta</span>
-      </a>
+    <!-- ===================================== -->
+    <!-- HEADER -->
+    <!-- ===================================== -->
+    <header class="header">
+        <div class="header__container">
+            <!-- Logo -->
+            <a class="brand" href="/terapeuta">
+                <span class="brand__icon" aria-hidden="true">✳︎</span>
+                <span class="brand__title">Panel del terapeuta</span>
+            </a>
 
-      <nav class="header__center" aria-label="Navegación principal">
-  <a class="header__link" href="dashboard.html">Inicio</a>
-  <a class="header__link" href="pacientes.html">Mis pacientes</a>
-</nav>
+            <!-- Navegación -->
+            <nav class="header__center" aria-label="Navegación principal">
+                <a class="header__link" href="/terapeuta">Inicio</a>
+                <a class="header__link" href="/pacientes">Pacientes</a>
+            </nav>
 
-      <nav class="header__actions" aria-label="Acciones de usuario">
-        <a class="header__button" href="#">Mi cuenta</a>
-      </nav>
-    </div>
-  </header>
+            <!-- Dropdown cuenta -->
+            <nav class="header__actions" aria-label="Acciones de usuario">
+                <div class="dropdown">
+                    <button class="header__button" id="menuButton" type="button">
+                        Mi cuenta
+                    </button>
+                    <div class="dropdown__menu" id="dropdownMenu">
+                        <a class="dropdown__item" href="#">Mis datos</a>
+                        <a class="dropdown__item" href="/logout">Cerrar sesión</a>
+                    </div>
+                </div>
+            </nav>
+        </div>
+    </header>
 
-  <main class="main">
-    <div class="main__container">
+    <!-- ===================================== -->
+    <!-- MAIN -->
+    <!-- ===================================== -->
+    <main class="main">
+        <div class="main__container">
 
-      <section class="hero"></section>
+            <!-- HERO -->
+            <section class="hero">
+                <div class="hero__content">
+                    <h1 class="hero__title">
+                        Hola, {{ session('usuario_nombre') }} 👋
+                    </h1>
+                    <p class="hero__text">
+                        Bienvenido al panel clínico de Papatzoa.
+                    </p>
+                </div>
+            </section>
 
-      <!-- =======================
-           SECCIÓN 1: Próximas citas
-           ======================= -->
-      <section class="content">
-        <h1 class="title">Próximas citas</h1>
+            <!-- PRÓXIMAS CITAS -->
+            <section class="content">
+                <h2 class="title">Próximas citas</h2>
+                <article class="card">
+                    <p class="card__description" style="margin-bottom: 12px;">
+                        Aquí verás las próximas citas agendadas por tus pacientes.
+                    </p>
 
-        <article class="card">
-          <p class="card__description" style="margin-bottom: 12px;">
-            Aquí verás las próximas citas agendadas por tus pacientes. (Por ahora es información de ejemplo.)
-          </p>
+                    <div class="table-wrap">
+                        <table class="table" aria-label="Tabla de próximas citas">
+                            <thead>
+                                <tr>
+                                    <th>Paciente</th>
+                                    <th>Fecha</th>
+                                    <th>Hora</th>
+                                    <th>Motivo / descripción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td data-label="Paciente">
+                                        <a class="table__link" href="#">María López</a>
+                                    </td>
+                                    <td data-label="Fecha">20 diciembre 2025</td>
+                                    <td data-label="Hora">10:30</td>
+                                    <td data-label="Motivo">Ansiedad laboral y problemas de sueño.</td>
+                                </tr>
+                                <tr>
+                                    <td data-label="Paciente">
+                                        <a class="table__link" href="#">Carlos Hernández</a>
+                                    </td>
+                                    <td data-label="Fecha">21 diciembre 2025</td>
+                                    <td data-label="Hora">16:00</td>
+                                    <td data-label="Motivo">Estrés por cambios personales y baja motivación.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
 
-          <div class="table-wrap">
-            <table class="table" aria-label="Tabla de próximas citas">
-              <thead>
-                <tr>
-                  <th>Paciente</th>
-                  <th>Fecha</th>
-                  <th>Hora</th>
-                  <th>Motivo / descripción</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td data-label="Paciente">
-                    <a class="table__link" href="expediente.html?paciente=Maria%20L%C3%B3pez">María López</a>
-                  </td>
-                  <td data-label="Fecha">20 diciembre 2025</td>
-                  <td data-label="Hora">10:30</td>
-                  <td data-label="Motivo">Ansiedad laboral y problemas de sueño.</td>
-                </tr>
+            <!-- PENDIENTES -->
+            <section class="content">
+                <h2 class="title">Citas pendientes por confirmar</h2>
+                <article class="card">
+                    <p class="card__description">
+                        Tienes <strong>2</strong> citas pendientes por confirmar.
+                        <a class="table__link" href="/confirmar">Ir a confirmar</a>
+                    </p>
+                </article> <!-- CORRECCIÓN: Se cerró el article aquí -->
+            </section>
 
-                <tr>
-                  <td data-label="Paciente">
-                    <a class="table__link" href="expediente.html?paciente=Carlos%20Hern%C3%A1ndez">Carlos Hernández</a>
-                  </td>
-                  <td data-label="Fecha">21 diciembre 2025</td>
-                  <td data-label="Hora">16:00</td>
-                  <td data-label="Motivo">Estrés por cambios personales y baja motivación.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </article>
-      </section>
+            <!-- INVITAR PACIENTE -->
+            <section class="content">
+                <h2 class="title">Invitar paciente</h2>
+                <article class="card">
+                    <p class="card__description" style="margin-bottom: 20px;">
+                        Genera un código para vincular pacientes a tu cuenta.
+                    </p>
 
-      <!-- ==================================
-           SECCIÓN 2: Pendientes por confirmar
-           ================================== -->
-      <section class="content">
-  <h2 class="title">Citas pendientes por confirmar</h2>
+                    @if ($terapeuta && $terapeuta->codigo_vinculacion)
+                        <div class="pin-box">
+                            <h3>PIN de vinculación</h3>
+                            <div class="pin-code">
+                                {{ $terapeuta->codigo_vinculacion }}
+                            </div>
+                            @if ($terapeuta->codigo_expira_en)
+                                <p class="pin-expiration">
+                                Expira: {{ \Carbon\Carbon::parse($terapeuta->codigo_expira_en)->format('d/m/Y H:i') }}
+                                </p>
+                            @endif
+                        </div>
+                    @endif
 
-  <article class="card">
-    <p class="card__description">
-      Tienes <strong>2</strong> citas pendientes por confirmar. <!--NUMERO DINAMICO-->
-      <a class="table__link" href="confirmar.html">Ir a confirmar</a>
+                    @if (
+
+    !$terapeuta ||
+    !$terapeuta->codigo_vinculacion ||
+    (
+        $terapeuta->codigo_expira_en &&
+        now()->gt($terapeuta->codigo_expira_en)
+    )
+
+)
+
+<form action="/generar-pin" method="POST">
+
+    @csrf
+
+    <button
+        class="header__button"
+        type="submit"
+    >
+        Generar PIN
+    </button>
+
+</form>
+
+@else
+
+<div class="pin-active">
+
+    <strong>
+        PIN activo actualmente
+    </strong>
+
+    <p>
+
+        No puedes generar otro PIN
+        hasta que expire el actual.
+
     </p>
-  </article>
-</section>
 
-    </div>
-  </main>
+</div>
 
-  
+@endif
+                </article>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- SCRIPT DROPDOWN -->
+    <script>
+        const menuButton = document.getElementById('menuButton');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+
+        menuButton.addEventListener('click', () => {
+            dropdownMenu.classList.toggle('show');
+        });
+
+        window.addEventListener('click', (e) => {
+            if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                dropdownMenu.classList.remove('show');
+            }
+        });
+    </script>
+
+</body>
+</html>

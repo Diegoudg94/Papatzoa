@@ -1,67 +1,229 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
+
 <head>
+
+    <!-- ===================================== -->
+    <!-- CONFIGURACIÓN BÁSICA -->
+    <!-- ===================================== -->
+
+    <!-- Codificación UTF-8 -->
     <meta charset="UTF-8">
+
+    <!-- Responsive design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="login.css">
+
+    <!-- CSS cargado desde public/css -->
+    <link rel="stylesheet" href="{{ asset('css/login.css') }}">
+
+    <!-- Título de la pestaña -->
     <title>Iniciar sesión</title>
+
 </head>
-<body> 
-   <main class="page">
-  <section class="card">
-    <header class="card__header">
-      <h1 class="title">Iniciar sesión</h1>
-      <p class="subtitle">Accede con tu correo y contraseña</p>
-    </header>
 
-    <form class="card" action="dashboard.html" method="post" autocomplete="on" novalidate>
-      <fieldset class="form__fieldset">
-        <legend class="form__legend">Datos de acceso</legend>
+<body>
 
-        <div class="form__group">
-          <label class="form__label" for="email">Correo electrónico</label>
-          <input
-            class="form__input"
-            type="email"
-            id="email"
-            name="email"
-            placeholder="tu@correo.com"
-            required
-          />
-        </div>
+    <!-- ===================================== -->
+    <!-- CONTENEDOR PRINCIPAL -->
+    <!-- ===================================== -->
 
-        <div class="form__group">
-          <label class="form__label" for="password">Contraseña</label>
-          <input
-            class="form__input"
-            type="password"
-            id="password"
-            name="password"
-            placeholder="••••••••"
-            required
-            minlength="6"
-          />
-        </div>
-      </fieldset>
+    <main class="page">
 
-      <div class="form__row">
-        <label class="form__checkbox">
-          <input class="form__checkbox-input" type="checkbox" name="remember">
-          <span class="form__checkbox-text">Recordarme</span>
-        </label>
+        <!-- Tarjeta principal -->
+        <section class="card">
 
-        <a class="form__link" href="#">¿Olvidaste tu contraseña?</a>
-      </div>
+            <!-- ===================================== -->
+            <!-- ENCABEZADO -->
+            <!-- ===================================== -->
 
-      <button class="button" type="submit">Entrar</button>
+            <header class="card__header">
 
-      <p class="form__footer">
-        ¿No tienes cuenta?
-        <a class="form__link" href="nuevousuario.html">Crear cuenta</a>
-      </p>
-    </form>
-  </section>
-</main>
-</main>
+                <!-- Título -->
+                <h1 class="title">
+                    Iniciar sesión
+                </h1>
+
+                <!-- Subtítulo -->
+                <p class="subtitle">
+                    Accede con tu correo y contraseña
+                </p>
+
+            </header>
+
+
+            <!-- ===================================== -->
+            <!-- FORMULARIO -->
+            <!-- ===================================== -->
+
+            <!--
+                action="/login"
+                -> envía el formulario a la ruta login
+                
+                method="post"
+                -> protege los datos sensibles
+                
+                @csrf
+                -> token de seguridad obligatorio en Laravel
+            -->
+@if ($errors->any())
+
+  <div
+    style="
+      background:#fee2e2;
+      color:#991b1b;
+      padding:12px;
+      border-radius:8px;
+      margin-bottom:16px;
+      border:1px solid #fca5a5;
+    "
+  >
+
+    <ul style="padding-left:18px;">
+
+      @foreach ($errors->all() as $error)
+
+        <li>{{ $error }}</li>
+
+      @endforeach
+
+    </ul>
+
+  </div>
+
+@endif
+            <form
+                class="card"
+                action="/login"
+                method="post"
+                autocomplete="on"
+                novalidate
+            >
+
+                @csrf
+
+                <!-- ===================================== -->
+                <!-- FIELDSET -->
+                <!-- ===================================== -->
+
+                <fieldset class="form__fieldset">
+
+                    <!-- Título del grupo -->
+                    <legend class="form__legend">
+                        Datos de acceso
+                    </legend>
+
+                    <!-- ===================================== -->
+                    <!-- INPUT EMAIL -->
+                    <!-- ===================================== -->
+
+                    <div class="form__group">
+
+                        <label
+                            class="form__label"
+                            for="email"
+                        >
+                            Correo electrónico
+                        </label>
+
+                        <input
+                            class="form__input"
+                            type="email"
+                            id="email"
+                            name="email"
+                            placeholder="tu@correo.com"
+                            required
+                        />
+
+                    </div>
+
+
+                    <!-- ===================================== -->
+                    <!-- INPUT PASSWORD -->
+                    <!-- ===================================== -->
+
+                    <div class="form__group">
+
+                        <label
+                            class="form__label"
+                            for="password"
+                        >
+                            Contraseña
+                        </label>
+
+                        <input
+                            class="form__input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="••••••••"
+                            required
+                            minlength="6"
+                        />
+
+                    </div>
+
+                </fieldset>
+
+
+                <!-- ===================================== -->
+                <!-- OPCIONES EXTRA -->
+                <!-- ===================================== -->
+
+                <div class="form__row">
+
+                    <!-- Checkbox recordar -->
+                    <label class="form__checkbox">
+
+                        <input
+                            class="form__checkbox-input"
+                            type="checkbox"
+                            name="remember"
+                        >
+
+                        <span class="form__checkbox-text">
+                            Recordarme
+                        </span>
+
+                    </label>
+
+                    <!-- Recuperar contraseña -->
+                    <a class="form__link" href="#">
+                        ¿Olvidaste tu contraseña?
+                    </a>
+
+                </div>
+
+
+                <!-- ===================================== -->
+                <!-- BOTÓN -->
+                <!-- ===================================== -->
+
+                <button class="button" type="submit">
+                    Entrar
+                </button>
+
+
+                <!-- ===================================== -->
+                <!-- FOOTER -->
+                <!-- ===================================== -->
+
+                <p class="form__footer">
+
+                    ¿No tienes cuenta?
+
+                    <!-- Redirección al registro -->
+                    <a class="form__link" href="/">
+                        Crear cuenta
+                    </a>
+
+                </p>
+
+            </form>
+
+        </section>
+
+    </main>
+
 </body>
+
 </html>

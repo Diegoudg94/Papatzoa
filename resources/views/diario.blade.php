@@ -3,24 +3,32 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Diario de emociones</title>
-  <link rel="stylesheet" href="terapeuta.css" />
-</head>
+  <title>Papatzoa - Diario de emociones</title>
 
+  <!-- CSS: Mantengo la sintaxis de Blade por si estás en Laravel, 
+       si no, cámbialo a href="css/terapeuta.css" -->
+  <link rel="stylesheet" href="{{ asset('css/terapeuta.css') }}">
+
+  <style>
+    /* Estilos mínimos para asegurar que los chips y estados se vean */
+    .is-active { font-weight: bold; color: #000; border-bottom: 2px solid #000; }
+    .is-selected { background-color: #000 !important; color: #fff !important; }
+    .hidden { display: none; }
+    .chip { cursor: pointer; padding: 8px 16px; border: 1px solid #ccc; border-radius: 20px; background: #fff; }
+    .sr-input { position: absolute; opacity: 0; pointer-events: none; }
+  </style>
+</head>
 <body>
 
-<!-- ================= HEADER ================= -->
 <header class="header">
   <div class="header__container">
-    <a class="brand" href="dashboard.html">
+    <a class="brand" href="/dashboard">
       <span class="brand__icon">✳︎</span>
       <span class="brand__title">Papatzoa</span>
     </a>
-
     <nav class="header__center">
-      <a class="header__link" href="dashboard.html">Inicio</a>
+      <a class="header__link" href="/dashboard">Inicio</a>
     </nav>
-
     <nav class="header__actions">
       <a class="header__button" href="#">Mi cuenta</a>
     </nav>
@@ -30,257 +38,352 @@
 <main class="main">
   <div class="main__container">
 
-    <!-- ================= PROGRESO ================= -->
+    <!-- PROGRESO -->
     <section class="content">
       <div class="progress">
-        <div class="progress__step is-active" data-step="1">1. Antecedente</div>
+        <div class="progress__step is-active" data-step="1">1. Situación</div>
         <div class="progress__line"></div>
         <div class="progress__step" data-step="2">2. Pensamiento</div>
         <div class="progress__line"></div>
         <div class="progress__step" data-step="3">3. Emoción</div>
+        <div class="progress__line"></div>
+        <div class="progress__step" data-step="4">4. Conducta</div>
+        <div class="progress__line"></div>
+        <div class="progress__step" data-step="5">5. Interpretación</div>
+        <div class="progress__line"></div>
+        <div class="progress__step" data-step="6">6. Reestructuración</div>
       </div>
     </section>
 
-    <!-- ================= TÍTULO ================= -->
     <section class="content">
       <h1 class="title">Diario de emociones</h1>
-      <p class="card__description">
-        Registra una situación, tu pensamiento y la emoción generada.
-      </p>
+      <p class="card__description">Registra una situación, pensamientos, emociones y reacciones.</p>
     </section>
 
-    <!-- =================================================
-         PASO 1: ANTECEDENTE
-         ================================================= -->
+    <!-- PASO 1 -->
     <section class="content" id="step1">
       <article class="card">
-
-        <h2 class="card__title">1) Antecedente inmediato</h2>
-
-        <!-- MODO EDICIÓN -->
+        <h2 class="card__title">1) Situación o antecedente</h2>
         <div id="antecedenteEdit">
-          <textarea
-            class="form__input"
-            id="antecedente"
-            rows="4"
-            placeholder="¿Qué fue lo que paso?"
-          ></textarea>
-
-          <button class="button" id="btnGuardarAntecedente" type="button">
-            Guardar antecedente
-          </button>
+          <p class="card__description">Describe brevemente qué ocurrió.</p>
+          <textarea class="form__input" id="antecedente" rows="4" placeholder="Ej: discutí con alguien..."></textarea>
+          <button class="button" id="btnGuardarAntecedente" type="button">Continuar</button>
         </div>
-
-        <!-- MODO LECTURA -->
         <div id="antecedenteView" hidden>
-          <p class="card__description">
-            <strong>Antecedente guardado ✅</strong>
-            <span id="antecedenteTimestamp"></span>
-          </p>
-
-          <div class="note">
-            <div class="note__text" id="antecedenteTextoView"></div>
-          </div>
+          <p class="card__description"><strong>Situación guardada ✅</strong> <span id="antecedenteTimestamp"></span></p>
+          <div class="note"><div class="note__text" id="antecedenteTextoView"></div></div>
         </div>
-
       </article>
     </section>
 
-    <!-- =================================================
-         PASO 2: PENSAMIENTO PASAR EL CUADRO DE EMOCIONES ENTRE EL PASO 1 Y 2 
-         ================================================= -->
+    <!-- PASO 2 -->
     <section class="content" id="step2" hidden>
       <article class="card">
-
-        <h2 class="card__title">2) Pensamiento (autoverbalización)</h2>
-
-        <!-- MODO EDICIÓN -->
+        <h2 class="card__title">2) Pensamiento automático</h2>
         <div id="pensamientoEdit">
-
-          <textarea
-            class="form__input"
-            id="pensamiento"
-            rows="4"
-            placeholder="¿Porque estoy sintiendo eso?"
-          ></textarea>
-
-          <!-- Hecho vs Opinión -->
+          <p class="card__description">¿Qué pasó por tu mente?</p>
+          <textarea class="form__input" id="pensamiento" rows="4" placeholder="Ej: 'Voy a fracasar'"></textarea>
           <div class="choice">
-            <div class="choice__title">Hecho u Opinión</div>
-
-            <input class="sr-input" type="radio" name="tipoPensamiento" id="tipoHecho" value="hecho">
-            <input class="sr-input" type="radio" name="tipoPensamiento" id="tipoOpinion" value="opinion">
-
+            <div class="choice__title">¿Es un hecho o una interpretación?</div>
+            <input class="sr-input" type="radio" name="tipoPensamiento" id="tipoHecho" value="Hecho">
+            <input class="sr-input" type="radio" name="tipoPensamiento" id="tipoOpinion" value="Interpretación">
             <div class="chips">
               <button class="chip" type="button" data-radio="tipoHecho">Hecho</button>
-              <button class="chip" type="button" data-radio="tipoOpinion">Opinión</button>
+              <button class="chip" type="button" data-radio="tipoOpinion">Interpretación</button>
             </div>
           </div>
-
-          <!-- Distorsiones --> <!-- Define el pensamiento que tiene el usuario en ese momento sea verdad o no  -->.
-          <div class="choice">
-            <div class="choice__title">Distorsiones cognitivas (opcional)</div>
-
-            <input class="sr-input" type="checkbox" id="d_catastro" value="Catastrofización">
-            <input class="sr-input" type="checkbox" id="d_mente" value="Lectura de mente">
-            <input class="sr-input" type="checkbox" id="d_general" value="Generalización">
-            <input class="sr-input" type="checkbox" id="d_bn" value="Blanco / negro">
-            <input class="sr-input" type="checkbox" id="d_personal" value="Personalización">
-
-            
-            
-
-            <div class="chips">
-              <button class="chip" data-check="d_catastro">Catastrofización</button>
-              <button class="chip" data-check="d_mente">Lectura de mente</button>
-              <button class="chip" data-check="d_general">Generalización</button>
-              <button class="chip" data-check="d_bn">Blanco / negro</button>
-              <button class="chip" data-check="d_personal">Personalización</button>
-            </div>
-          </div>
-
-          <button class="button" id="btnGuardarPensamiento" type="button">
-            Guardar pensamiento
-          </button>
-
+          <button class="button" id="btnGuardarPensamiento" type="button">Continuar</button>
         </div>
-
-
-        <!-- MODO LECTURA -->
         <div id="pensamientoView" hidden>
-          <p class="card__description">
-            <strong>Pensamiento guardado ✅</strong>
-            <span id="pensamientoTimestamp"></span>
-          </p>
-
-          <div class="note">
-            <div class="note__text" id="pensamientoTextoView"></div>
-          </div>
-
-          <div class="note">
-            <div class="note__text">
-              <strong>Tipo:</strong> <span id="pensamientoTipoView"></span><br>
-              <strong>Distorsiones:</strong> <span id="pensamientoDistorsionesView"></span>
-            </div>
-          </div>
+          <p class="card__description"><strong>Pensamiento guardado ✅</strong> <span id="pensamientoTimestamp"></span></p>
+          <div class="note"><div class="note__text" id="pensamientoTextoView"></div></div>
+          <div class="note"><div class="note__text"><strong>Clasificación:</strong> <span id="pensamientoTipoView"></span></div></div>
         </div>
-
       </article>
     </section>
 
-    <!-- =================================================
-         PASO 3: EMOCIÓN agregar opcion que diga otro y un input para escribir la emocion   y un paso 4 donde el usuario diga que crees que pueda hacer para cambiar esa emocion en caso de que sea negativa de forma opcional para el usuario
-         ================================================= -->
+    <!-- PASO 3 -->
     <section class="content" id="step3" hidden>
       <article class="card">
-
-        <h2 class="card__title">3) Emoción generada</h2>
-
-        <select class="form__input" id="emocion">
-          <option value="">Selecciona emoción</option>
-          <option value="Ansiedad">Ansiedad</option>
-          <option value="Tristeza">Tristeza</option>
-          <option value="Enojo">Enojo</option>
-          <option value="Miedo">Miedo</option>
-          <option value="Calma">Calma</option>
-          <option value="Alegría">Alegría</option>
-        </select>
-
-        <label class="form__label">
-          Intensidad:
-          <strong id="intensidadValor">5</strong>
-        </label>
-
-        <input type="range" id="intensidad" min="0" max="10" value="5" />
-
-        <button class="button" id="btnGuardarEmocion" type="button">
-          Guardar emoción
-        </button>
-
-        <p class="card__description" id="resumenEmocion"></p>
-
+        <h2 class="card__title">3) Emoción</h2>
+        <div id="emocionEdit">
+          <p class="card__description">¿Qué emoción apareció?</p>
+          <select class="form__input" id="emocion">
+            <option value="">Selecciona emoción</option>
+            <option value="Ansiedad">Ansiedad</option>
+            <option value="Tristeza">Tristeza</option>
+            <option value="Enojo">Enojo</option>
+            <option value="Miedo">Miedo</option>
+            <option value="Vergüenza">Vergüenza</option>
+            <option value="Culpa">Culpa</option>
+            <option value="Alegría">Alegría</option>
+          </select>
+          <label class="form__label">Intensidad: <strong id="intensidadValor">5</strong> /10</label>
+          <input type="range" id="intensidad" min="0" max="10" value="5" />
+          <button class="button" id="btnGuardarEmocion" type="button">Continuar</button>
+        </div>
+        <div id="emocionView" hidden>
+          <p class="card__description"><strong>Emoción guardada ✅</strong></p>
+          <div class="note"><div class="note__text" id="resumenEmocion"></div></div>
+        </div>
       </article>
     </section>
 
+    <!-- PASO 4 -->
+    <section class="content" id="step4" hidden>
+      <article class="card">
+        <h2 class="card__title">4) Conducta o reacción</h2>
+        <div id="conductaEdit">
+          <p class="card__description">¿Qué hiciste después?</p>
+          <textarea class="form__input" id="conducta" rows="4" placeholder="Ej: me aislé, lloré..."></textarea>
+          <button class="button" id="btnGuardarConducta" type="button">Continuar</button>
+        </div>
+        <div id="conductaView" hidden>
+          <p class="card__description"><strong>Reacción guardada ✅</strong></p>
+          <div class="note"><div class="note__text" id="conductaTextoView"></div></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- PASO 5 -->
+    <section class="content" id="step5" hidden>
+      <article class="card">
+        <h2 class="card__title">5) ¿Cómo estás interpretando esto?</h2>
+        <div id="distorsionesEdit">
+        <p class="card__description">
+  A veces nuestra mente interpreta las situaciones de forma extrema o poco objetiva.
+
+  Selecciona las opciones que más se parezcan a lo que pensaste o sentiste.
+</p>
+          <input class="sr-input" type="checkbox" id="d_catastro">
+          <input class="sr-input" type="checkbox" id="d_mente">
+          <input class="sr-input" type="checkbox" id="d_general">
+          <input class="sr-input" type="checkbox" id="d_bn">
+          <input class="sr-input" type="checkbox" id="d_personal">
+          <div class="chips">
+
+  <button
+    class="chip"
+    data-check="d_catastro"
+    type="button"
+  >
+    Catastrofización
+    <br>
+    <small>
+      Pensar que todo saldrá muy mal
+    </small>
+  </button>
+
+
+  <button
+    class="chip"
+    data-check="d_mente"
+    type="button"
+  >
+    Lectura de mente
+    <br>
+    <small>
+      Asumir lo que otros piensan
+    </small>
+  </button>
+
+
+  <button
+    class="chip"
+    data-check="d_general"
+    type="button"
+  >
+    Generalización
+    <br>
+    <small>
+      Creer que siempre pasa lo mismo
+    </small>
+  </button>
+
+
+  <button
+    class="chip"
+    data-check="d_bn"
+    type="button"
+  >
+    Blanco / negro
+    <br>
+    <small>
+      Ver todo como éxito o fracaso
+    </small>
+  </button>
+
+
+  <button
+    class="chip"
+    data-check="d_personal"
+    type="button"
+  >
+    Personalización
+    <br>
+    <small>
+      Culparte automáticamente
+    </small>
+  </button>
+
+</div>
+          <button class="button" id="btnGuardarDistorsiones" type="button">Continuar</button>
+        </div>
+        <div id="distorsionesView" hidden>
+            <p class="card__description"><strong>Interpretaciones detectadas ✅</strong></p>
+            <div class="note"><div id="distorsionesSeleccionadas"></div></div>
+        </div>
+      </article>
+    </section>
+
+    <!-- PASO 6 -->
+    <section class="content" id="step6" hidden>
+      <article class="card">
+        <h2 class="card__title">6) Reestructuración cognitiva</h2>
+        <div id="reestructuracionEdit">
+          <p class="card__description">Escribe una interpretación más equilibrada.</p>
+          <textarea class="form__input" id="reestructuracion" rows="5" placeholder="Ej: Tal vez no fue personal..."></textarea>
+          <button class="button" id="btnGuardarReestructuracion" type="button">Finalizar registro</button>
+        </div>
+        <div id="reestructuracionView" hidden>
+          <p class="card__description"><strong>Nueva interpretación guardada ✅</strong></p>
+          <div class="note"><div class="note__text" id="reestructuracionTextoView"></div></div>
+        </div>
+      </article>
+    </section>
   </div>
 </main>
 
-<!-- ===================== JAVASCRIPT ===================== -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  const format = d => d.toLocaleString('es-MX', { dateStyle:'short', timeStyle:'short' });
+  // --- DECLARACIÓN DE VARIABLES (Indispensable) ---
+  const select = (id) => document.getElementById(id);
 
-  const p1 = document.querySelector('[data-step="1"]');
-  const p2 = document.querySelector('[data-step="2"]');
-  const p3 = document.querySelector('[data-step="3"]');
+  // Pasos y progreso
+  const steps = [null, select('step1'), select('step2'), select('step3'), select('step4'), select('step5'), select('step6')];
+  const progressSteps = [null, document.querySelector('[data-step="1"]'), document.querySelector('[data-step="2"]'), document.querySelector('[data-step="3"]'), document.querySelector('[data-step="4"]'), document.querySelector('[data-step="5"]'), document.querySelector('[data-step="6"]')];
 
-  /* ===== PASO 1 ===== */
-  btnGuardarAntecedente.onclick = () => {
-    if (!antecedente.value.trim()) return alert('Escribe el antecedente.');
+  // Elementos Paso 1
+  const btnP1 = select('btnGuardarAntecedente');
+  const antInput = select('antecedente');
 
-    antecedenteTextoView.textContent = antecedente.value;
-    antecedenteTimestamp.textContent = ` — ${format(new Date())}`;
+  // Elementos Paso 2
+  const btnP2 = select('btnGuardarPensamiento');
+  const penInput = select('pensamiento');
 
-    antecedenteEdit.hidden = true;
-    antecedenteView.hidden = false;
+  // Elementos Paso 3
+  const btnP3 = select('btnGuardarEmocion');
+  const emoSelect = select('emocion');
+  const intInput = select('intensidad');
+  const intValor = select('intensidadValor');
 
-    step2.hidden = false;
-    p1.classList.replace('is-active','is-done');
-    p2.classList.add('is-active');
-    step2.scrollIntoView({behavior:'smooth'});
+  // Elementos Paso 4
+  const btnP4 = select('btnGuardarConducta');
+  const conInput = select('conducta');
+
+  // Elementos Paso 5
+  const btnP5 = select('btnGuardarDistorsiones');
+
+  // Elementos Paso 6
+  const btnP6 = select('btnGuardarReestructuracion');
+  const reestInput = select('reestructuracion');
+
+  // Función genérica para cambiar de paso
+  function goToStep(current, next) {
+    progressSteps[current].classList.remove('is-active');
+    progressSteps[next].classList.add('is-active');
+    steps[next].hidden = false;
+    steps[next].scrollIntoView({ behavior: 'smooth' });
+  }
+
+  /* LÓGICA PASO 1 */
+  btnP1.onclick = () => {
+    if (!antInput.value.trim()) return alert('Describe la situación.');
+    select('antecedenteTextoView').textContent = antInput.value;
+    select('antecedenteTimestamp').textContent = new Date().toLocaleString();
+    select('antecedenteEdit').hidden = true;
+    select('antecedenteView').hidden = false;
+    goToStep(1, 2);
   };
 
-  /* ===== CHIPS ===== */
+  /* LÓGICA CHIPS RADIO (PASO 2) */
   document.querySelectorAll('[data-radio]').forEach(btn => {
     btn.onclick = () => {
-      const input = document.getElementById(btn.dataset.radio);
+      const input = select(btn.dataset.radio);
       input.checked = true;
-      btn.parentElement.querySelectorAll('.chip').forEach(b=>b.classList.remove('is-selected'));
+      btn.parentElement.querySelectorAll('.chip').forEach(b => b.classList.remove('is-selected'));
       btn.classList.add('is-selected');
     };
   });
 
+  /* LÓGICA PASO 2 */
+  btnP2.onclick = () => {
+    const tipo = document.querySelector('input[name="tipoPensamiento"]:checked');
+    if (!penInput.value.trim() || !tipo) return alert('Completa el pensamiento y su tipo.');
+    select('pensamientoTextoView').textContent = penInput.value;
+    select('pensamientoTipoView').textContent = tipo.value;
+    select('pensamientoTimestamp').textContent = new Date().toLocaleString();
+    select('pensamientoEdit').hidden = true;
+    select('pensamientoView').hidden = false;
+    goToStep(2, 3);
+  };
+
+  /* LÓGICA PASO 3 */
+  intInput.oninput = () => { intValor.textContent = intInput.value; };
+  btnP3.onclick = () => {
+    if (!emoSelect.value) return alert('Selecciona una emoción.');
+    select('resumenEmocion').textContent = `Emoción: ${emoSelect.value} (${intInput.value}/10)`;
+    select('emocionEdit').hidden = true;
+    select('emocionView').hidden = false;
+    goToStep(3, 4);
+  };
+
+  /* LÓGICA PASO 4 */
+  btnP4.onclick = () => {
+    if (!conInput.value.trim()) return alert('Describe tu reacción.');
+    select('conductaTextoView').textContent = conInput.value;
+    select('conductaEdit').hidden = true;
+    select('conductaView').hidden = false;
+    goToStep(4, 5);
+  };
+
+  /* LÓGICA CHIPS CHECKBOX (PASO 5) */
   document.querySelectorAll('[data-check]').forEach(btn => {
     btn.onclick = () => {
-      const input = document.getElementById(btn.dataset.check);
+      const input = select(btn.dataset.check);
       input.checked = !input.checked;
       btn.classList.toggle('is-selected', input.checked);
     };
   });
 
-  /* ===== PASO 2 ===== */
-  btnGuardarPensamiento.onclick = () => {
-    if (!pensamiento.value.trim()) return alert('Escribe tu pensamiento.');
-    const tipo = document.querySelector('input[name="tipoPensamiento"]:checked');
-    if (!tipo) return alert('Selecciona Hecho u Opinión.');
+  /* LÓGICA PASO 5 */
+  btnP5.onclick = () => {
+    const dists = {
+      'd_catastro': 'Catastrofización',
+      'd_mente': 'Lectura de mente',
+      'd_general': 'Generalización',
+      'd_bn': 'Blanco / negro',
+      'd_personal': 'Personalización'
+    };
+    const seleccionadas = Object.keys(dists).filter(id => select(id).checked).map(id => dists[id]);
 
-    const dist = [...document.querySelectorAll('.sr-input[type="checkbox"]:checked')]
-      .map(i => i.value);
+    if (seleccionadas.length === 0) return alert('Selecciona al menos una interpretación.');
 
-    pensamientoTextoView.textContent = pensamiento.value;
-    pensamientoTipoView.textContent = tipo.value;
-    pensamientoDistorsionesView.textContent = dist.length ? dist.join(', ') : 'Ninguna';
-    pensamientoTimestamp.textContent = ` — ${format(new Date())}`;
-
-    pensamientoEdit.hidden = true;
-    pensamientoView.hidden = false;
-
-    step3.hidden = false;
-    p2.classList.replace('is-active','is-done');
-    p3.classList.add('is-active');
-    step3.scrollIntoView({behavior:'smooth'});
+    select('distorsionesSeleccionadas').innerHTML = seleccionadas.map(item => `• ${item}`).join('<br>');
+    select('distorsionesEdit').hidden = true;
+    select('distorsionesView').hidden = false;
+    goToStep(5, 6);
   };
 
-  /* ===== PASO 3 ===== */
-  intensidad.oninput = () => intensidadValor.textContent = intensidad.value;
-
-  btnGuardarEmocion.onclick = () => {
-    if (!emocion.value) return alert('Selecciona una emoción.');
-    resumenEmocion.textContent =
-      `Emoción guardada ✅ — ${emocion.value} (${intensidad.value}/10)`;
+  /* LÓGICA PASO 6 */
+  btnP6.onclick = () => {
+    if (!reestInput.value.trim()) return alert('Escribe una reinterpretación.');
+    select('reestructuracionTextoView').textContent = reestInput.value;
+    select('reestructuracionEdit').hidden = true;
+    select('reestructuracionView').hidden = false;
+    alert('Registro emocional finalizado ✅');
   };
-
 });
 </script>
 

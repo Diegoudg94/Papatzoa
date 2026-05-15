@@ -592,3 +592,126 @@ textarea.form__input {
     padding: 12px 14px;
   }
 }
+
+/* =========================
+   HERO
+========================= */
+
+.hero {
+
+  background: #dfe4f7;
+
+  border-radius: 24px;
+
+  padding: 40px;
+
+  margin-bottom: 40px;
+
+}
+
+.hero__title {
+
+  font-size: 2rem;
+
+  margin-bottom: 12px;
+
+  color: #111827;
+
+}
+
+.hero__text {
+
+  color: #4b5563;
+
+  font-size: 1rem;
+
+}
+
+
+/* =========================
+   DROPDOWN
+========================= */
+
+.dropdown {
+
+  position: relative;
+
+}
+
+.dropdown__menu {
+
+  position: absolute;
+
+  top: 56px;
+
+  right: 0;
+
+  background: white;
+
+  border-radius: 12px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+
+  min-width: 180px;
+
+  padding: 8px;
+
+  display: none;
+
+  z-index: 1000;
+
+}
+
+.dropdown__menu.show {
+
+  display: flex;
+
+  flex-direction: column;
+
+}
+
+.dropdown__item {
+
+  padding: 12px;
+
+  border-radius: 8px;
+
+  text-decoration: none;
+
+  color: #111827;
+
+  transition: background 0.2s;
+
+}
+
+.dropdown__item:hover {
+
+  background: #f3f4f6;
+
+}
+.pin-expiration {
+
+  margin-top: 10px;
+  color: #6b7280;
+  font-size: 0.95rem;
+
+}
+
+.pin-active {
+
+  margin-top: 18px;
+  background: #eef2ff;
+  border: 1px solid #c7d2fe;
+  color: #3730a3;
+  padding: 16px;
+  border-radius: 14px;
+  max-width: 420px;
+
+}
+
+.pin-active p {
+
+  margin-top: 8px;
+  color: #4b5563;
+
+}

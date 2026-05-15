@@ -1,92 +1,298 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
+
+  <!-- ===================================== -->
+  <!-- CONFIGURACIÓN BÁSICA -->
+  <!-- ===================================== -->
+
+  <!-- Codificación UTF-8 -->
   <meta charset="UTF-8" />
+
+  <!-- Responsive design -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Título -->
   <title>Citas</title>
-  <link rel="stylesheet" href="citas.css" />
+
+  <!--
+    CSS cargado desde Laravel
+    
+    El archivo debe estar en:
+    public/css/citas.css
+  -->
+  <link rel="stylesheet" href="{{ asset('css/citas.css') }}" />
+
 </head>
+
 <body>
 
+  <!-- ===================================== -->
+  <!-- HEADER -->
+  <!-- ===================================== -->
+
   <header class="header">
-  <div class="header__container">
 
-    <!-- Izquierda: logo -->
-    <a class="brand" href="dashboard.html">
-      <span class="brand__icon" aria-hidden="true">✳︎</span>
-      <span class="brand__title">¿Cómo te sientes hoy?</span>
-    </a>
+    <div class="header__container">
 
-    <!-- Centro: Inicio -->
-    <nav class="header__center" aria-label="Navegación principal">
-      <a class="header__link header__link--active" href="dashboard.html">
-        Inicio
+      <!-- ===================================== -->
+      <!-- LOGO -->
+      <!-- ===================================== -->
+
+      <a class="brand" href="/dashboard">
+
+        <span
+          class="brand__icon"
+          aria-hidden="true"
+        >
+          ✳︎
+        </span>
+
+        <span class="brand__title">
+          ¿Cómo te sientes hoy?
+        </span>
+
       </a>
-    </nav>
 
-    <!-- Derecha: cuenta -->
-    <nav class="header__actions" aria-label="Acciones de usuario">
-      <a class="header__button" href="#">Mi cuenta</a>
-    </nav>
 
-  </div>
-</header>
+      <!-- ===================================== -->
+      <!-- NAVEGACIÓN CENTRAL -->
+      <!-- ===================================== -->
+
+      <nav
+        class="header__center"
+        aria-label="Navegación principal"
+      >
+
+        <!-- Link activo -->
+        <a
+          class="header__link header__link--active"
+          href="/dashboard"
+        >
+          Inicio
+        </a>
+
+      </nav>
+
+
+      <!-- ===================================== -->
+      <!-- ACCIONES USUARIO -->
+      <!-- ===================================== -->
+
+      <nav
+        class="header__actions"
+        aria-label="Acciones de usuario"
+      >
+
+        <a
+          class="header__button"
+          href="#"
+        >
+          Mi cuenta
+        </a>
+
+      </nav>
+
+    </div>
+
+  </header>
+
+
+  <!-- ===================================== -->
+  <!-- CONTENIDO PRINCIPAL -->
+  <!-- ===================================== -->
 
   <main class="main">
+
     <div class="main__container">
 
+      <!-- Banner decorativo -->
       <section class="hero"></section>
 
-      <!-- Cuadro: próxima cita -->
+
+      <!-- ===================================== -->
+      <!-- PRÓXIMA CITA -->
+      <!-- ===================================== -->
+
       <section class="content">
-        <h1 class="title">Mi próxima cita</h1>
+
+        <h1 class="title">
+          Mi próxima cita
+        </h1>
 
         <article class="card">
-  <div class="card__image" aria-hidden="true"></div>
-  <h2 class="card__title">Cita con Psicólogo</h2>
 
-  <p class="card__description" id="citaVacia">
-    No tienes citas agendadas.
-  </p>
+          <!-- Imagen decorativa -->
+          <div
+            class="card__image"
+            aria-hidden="true"
+          ></div>
 
-  <p class="card__description" id="citaDetalle" hidden>
-    <strong>Fecha:</strong> <span id="citaFecha"></span><br>
-    <strong>Hora:</strong> <span id="citaHora"></span><br>
-    <strong>Motivo:</strong> <span id="citaMotivo"></span><br>
-    <strong>Estatus:</strong> <span id="citaEstatus"></span>
-  </p>
+          <!-- Título -->
+          <h2 class="card__title">
+            Cita con Psicólogo
+          </h2>
 
-  <button
-    class="button button--secondary"
-    id="btnCancelarCita"
-    type="button"
-    hidden
-  >
-    Cancelar cita
-  </button>
-</article>
+
+          <!-- ===================================== -->
+          <!-- MENSAJE SIN CITA -->
+          <!-- ===================================== -->
+
+          <p
+            class="card__description"
+            id="citaVacia"
+          >
+            No tienes citas agendadas.
+          </p>
+
+
+          <!-- ===================================== -->
+          <!-- DETALLE DE CITA -->
+          <!-- ===================================== -->
+
+          <p
+            class="card__description"
+            id="citaDetalle"
+            hidden
+          >
+
+            <strong>Fecha:</strong>
+            <span id="citaFecha"></span>
+
+            <br>
+
+            <strong>Hora:</strong>
+            <span id="citaHora"></span>
+
+            <br>
+
+            <strong>Motivo:</strong>
+            <span id="citaMotivo"></span>
+
+            <br>
+
+            <strong>Estatus:</strong>
+            <span id="citaEstatus"></span>
+
+          </p>
+
+
+          <!-- ===================================== -->
+          <!-- BOTÓN CANCELAR -->
+          <!-- ===================================== -->
+
+          <button
+            class="button button--secondary"
+            id="btnCancelarCita"
+            type="button"
+            hidden
+          >
+            Cancelar cita
+          </button>
+
+        </article>
+
       </section>
 
-      <!-- Formulario: agendar cita -->
+
+      <!-- ===================================== -->
+      <!-- FORMULARIO AGENDAR -->
+      <!-- ===================================== -->
+
       <section class="content">
-        <h2 class="card__title">Agendar una cita</h2>
 
-        <form class="form" id="formCita" action="#" method="post" novalidate>
+        <h2 class="card__title">
+          Solicitar una cita 
+        </h2>
+
+
+        <!--
+          Formulario temporal frontend
+          
+          action="#"
+          -> no envía a backend todavía
+        -->
+
+        <form
+          class="form"
+          id="formCita"
+          action="#"
+          method="post"
+          novalidate
+        >
+
+          <!-- Seguridad Laravel -->
+          @csrf
+
           <fieldset class="form__fieldset">
-            <legend class="form__legend">Detalles de la cita</legend>
+
+            <legend class="form__legend">
+              Detalles de la cita
+            </legend>
+
+
+            <!-- ===================================== -->
+            <!-- FECHA -->
+            <!-- ===================================== -->
 
             <div class="form__group">
-              <label class="form__label" for="fecha">¿Qué fecha quieres?</label>
-              <input class="form__input" type="date" id="fecha" name="fecha" required />
+
+              <label
+                class="form__label"
+                for="fecha"
+              >
+                ¿Qué fecha quieres?
+              </label>
+
+              <input
+                class="form__input"
+                type="date"
+                id="fecha"
+                name="fecha"
+                required
+              />
+
             </div>
 
-            <div class="form__group">
-              <label class="form__label" for="hora">Selecciona una hora</label>
-              <input class="form__input" type="time" id="hora" name="hora" required />
-            </div>
+
+            <!-- ===================================== -->
+            <!-- HORA -->
+            <!-- ===================================== -->
 
             <div class="form__group">
-              <label class="form__label" for="motivo">Motivo / temas a tratar</label>
+
+              <label
+                class="form__label"
+                for="hora"
+              >
+                Selecciona una hora
+              </label>
+
+              <input
+                class="form__input"
+                type="time"
+                id="hora"
+                name="hora"
+                required
+              />
+
+            </div>
+
+
+            <!-- ===================================== -->
+            <!-- MOTIVO -->
+            <!-- ===================================== -->
+
+            <div class="form__group">
+
+              <label
+                class="form__label"
+                for="motivo"
+              >
+                Motivo / temas a tratar
+              </label>
+
               <textarea
                 class="form__input"
                 id="motivo"
@@ -95,65 +301,155 @@
                 placeholder="Ej: ansiedad, estrés, conflictos personales..."
                 required
               ></textarea>
+
             </div>
+
           </fieldset>
 
-          <button class="button" type="submit">Agendar</button>
+
+          <!-- ===================================== -->
+          <!-- BOTÓN -->
+          <!-- ===================================== -->
+
+          <button
+            class="button"
+            type="submit"
+          >
+            Solicitar cita
+          </button>
+
         </form>
+
       </section>
 
     </div>
+
   </main>
 
+
+  <!-- ===================================== -->
+  <!-- JAVASCRIPT -->
+  <!-- ===================================== -->
+
   <script>
-  const form = document.getElementById('formCita');
-  const btnCancelar = document.getElementById('btnCancelarCita');
 
-  const citaVacia = document.getElementById('citaVacia');
-  const citaDetalle = document.getElementById('citaDetalle');
+    // =====================================
+    // ELEMENTOS HTML
+    // =====================================
 
-  const citaFecha = document.getElementById('citaFecha');
-  const citaHora = document.getElementById('citaHora');
-  const citaMotivo = document.getElementById('citaMotivo');
-  const citaEstatus = document.getElementById('citaEstatus');
+    const form = document.getElementById('formCita');
 
-  // Al agendar cita
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+    const btnCancelar =
+      document.getElementById('btnCancelarCita');
 
-    const fechaValue = document.getElementById('fecha').value;
-    const horaValue = document.getElementById('hora').value;
-    const motivoValue = document.getElementById('motivo').value.trim();
+    const citaVacia =
+      document.getElementById('citaVacia');
 
-    if (!fechaValue || !horaValue || !motivoValue) {
-      alert('Por favor llena fecha, hora y motivo.');
-      return;
-    }
+    const citaDetalle =
+      document.getElementById('citaDetalle');
 
-    const fechaFormateada = new Date(fechaValue + 'T00:00:00')
-      .toLocaleDateString('es-MX', {
-        day: '2-digit',
-        month: 'long',
-        year: 'numeric'
-      });
+    const citaFecha =
+      document.getElementById('citaFecha');
 
-    // Mostrar cita
-    citaFecha.textContent = fechaFormateada;
-    citaHora.textContent = horaValue;
-    citaMotivo.textContent = motivoValue;
-    citaEstatus.textContent = '(pendiente de confirmación)';
+    const citaHora =
+      document.getElementById('citaHora');
 
-    citaVacia.hidden = true;
-    citaDetalle.hidden = false;
-    btnCancelar.hidden = false;
+    const citaMotivo =
+      document.getElementById('citaMotivo');
 
-    form.reset();
-  });
+    const citaEstatus =
+      document.getElementById('citaEstatus');
 
-  // Al cancelar cita
-  btnCancelar.addEventListener('click', () => {
-    citaDetalle.hidden = true;
-    btnCancelar.hidden = true;
-    citaVacia.hidden = false;
-  });
-</script>
+
+    // =====================================
+    // AGENDAR CITA
+    // =====================================
+
+    form.addEventListener('submit', (e) => {
+
+      // Evita recargar página
+      e.preventDefault();
+
+      // Obtener valores
+      const fechaValue =
+        document.getElementById('fecha').value;
+
+      const horaValue =
+        document.getElementById('hora').value;
+
+      const motivoValue =
+        document.getElementById('motivo').value.trim();
+
+
+      // Validación básica
+      if (!fechaValue || !horaValue || !motivoValue) {
+
+        alert(
+          'Por favor llena fecha, hora y motivo.'
+        );
+
+        return;
+      }
+
+
+      // Formatear fecha
+      const fechaFormateada =
+        new Date(fechaValue + 'T00:00:00')
+          .toLocaleDateString('es-MX', {
+
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+
+          });
+
+
+      // Mostrar información
+      citaFecha.textContent =
+        fechaFormateada;
+
+      citaHora.textContent =
+        horaValue;
+
+      citaMotivo.textContent =
+        motivoValue;
+
+      citaEstatus.textContent =
+        'Pendiente de confirmación';
+
+
+      // Mostrar tarjeta
+      citaVacia.hidden = true;
+
+      citaDetalle.hidden = false;
+
+      btnCancelar.hidden = false;
+
+
+      // Limpiar formulario
+      form.reset();
+
+    });
+
+
+    // =====================================
+    // CANCELAR CITA
+    // =====================================
+
+    btnCancelar.addEventListener('click', () => {
+
+      // Ocultar detalle
+      citaDetalle.hidden = true;
+
+      btnCancelar.hidden = true;
+
+      // Mostrar mensaje vacío
+      citaVacia.hidden = false;
+
+    });
+
+  </script>
+
+</body>
+
+</html>

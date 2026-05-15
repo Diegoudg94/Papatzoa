@@ -99,4 +99,8 @@ public/images/     -> Imágenes y recursos gráficos
 
 routes/            -> Definición de rutas
 
+<<<<<<< HEAD
 database/          -> Migraciones y base de datos SQLite
+=======
+database/          -> Migraciones y base de datos SQLite
+>>>>>>> temporal

@@ -1,22 +1,20 @@
 <?php
+
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Crypt;
+use App\Http\Controllers\UsuarioController;
 use App\Models\User;
 
 /*
 |--------------------------------------------------------------------------
-| Página principal
+| Página principal / Landing page
 |--------------------------------------------------------------------------
-|
-| Muestra el formulario de registro
-|
 */
 
 Route::get('/', function () {
-    return view('registro');
+    return view('welcome');
 });
 
 
@@ -24,41 +22,36 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 | Registro de usuarios
 |--------------------------------------------------------------------------
-|
-| Procesa el formulario de registro
-|
+| GET  -> muestra el formulario de registro
+| POST -> procesa el registro
+|--------------------------------------------------------------------------
 */
+
+Route::get('/registro', function () {
+    return view('registro');
+});
 
 Route::post('/registro', [UsuarioController::class, 'registrar']);
 
 
 /*
 |--------------------------------------------------------------------------
-| Vista login
+| Login y logout
 |--------------------------------------------------------------------------
-|
-| Muestra la pantalla de login
-|
 */
 
 Route::get('/login', function () {
     return view('login');
 });
+
+Route::post('/login', [UsuarioController::class, 'login']);
+
 Route::get('/logout', [UsuarioController::class, 'logout']);
+
 
 /*
 |--------------------------------------------------------------------------
-| Procesar login
-|--------------------------------------------------------------------------
-|
-| Temporalmente solo redirige al dashboard
-| Más adelante aquí irá autenticación real
-|
-*/
-Route::post('/login', [UsuarioController::class, 'login']);
-/*
-|--------------------------------------------------------------------------
-| Dashboard principal
+| Dashboard paciente
 |--------------------------------------------------------------------------
 */
 
@@ -69,7 +62,7 @@ Route::get('/dashboard', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Vistas secundarias
+| Vistas secundarias del paciente
 |--------------------------------------------------------------------------
 */
 
@@ -85,36 +78,12 @@ Route::get('/ayuda', function () {
     return view('ayuda');
 });
 
-Route::get('/pacientes', function () {
 
-    // Obtener ID terapeuta desde sesión
-    $terapeutaId = session('usuario_id');
-
-    // Evitar que falle o busque "null" si la sesión expiró
-    if (!$terapeutaId) {
-        return redirect('/login');
-    }
-
-    // Buscar pacientes vinculados
-    $pacientes = DB::table('users')
-        ->where(function ($query) use ($terapeutaId) {
-            // Buscamos tanto en formato numérico como en texto 
-            // (por si SQLite lo guardó como String anteriormente)
-            $query->where('terapeuta_id', (int) $terapeutaId)
-                  ->orWhere('terapeuta_id', (string) $terapeutaId);
-        })
-        ->where(function ($query) {
-            $query->where('terapeuta', 0)
-                  ->orWhere('terapeuta', '0');
-        })
-        ->get();
-
-    return view(
-        'pacientes',
-        compact('pacientes')
-    );
-
-});
+/*
+|--------------------------------------------------------------------------
+| Panel terapeuta
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/terapeuta', function () {
     return view('terapeuta');
@@ -124,13 +93,61 @@ Route::get('/confirmar', function () {
     return view('confirmar');
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Pacientes vinculados al terapeuta
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/pacientes', function () {
+
+    $terapeutaId = session('usuario_id');
+
+    if (!$terapeutaId) {
+        return redirect('/login');
+    }
+
+    $pacientes = DB::table('users')
+        ->where(function ($query) use ($terapeutaId) {
+            $query->where('terapeuta_id', (int) $terapeutaId)
+                  ->orWhere('terapeuta_id', (string) $terapeutaId);
+        })
+        ->where(function ($query) {
+            $query->where('terapeuta', 0)
+                  ->orWhere('terapeuta', '0');
+        })
+        ->get();
+
+    return view('pacientes', compact('pacientes'));
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Expediente dinámico del paciente
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/expediente/{id}', function ($id) {
 
     $paciente = User::find($id);
 
+    if (!$paciente) {
+        abort(404);
+    }
+
     return view('expediente', compact('paciente'));
 
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Generar PIN de vinculación para terapeuta
+|--------------------------------------------------------------------------
+*/
 
 Route::post('/generar-pin', function () {
 
@@ -140,7 +157,6 @@ Route::post('/generar-pin', function () {
         return redirect('/login');
     }
 
-    // Buscar terapeuta
     $terapeuta = DB::table('users')
         ->where('id', $usuarioId)
         ->first();
@@ -149,95 +165,84 @@ Route::post('/generar-pin', function () {
         return redirect('/login');
     }
 
-    // Si ya tiene PIN vigente
     if (
-
         $terapeuta->codigo_vinculacion &&
         $terapeuta->codigo_expira_en &&
         now()->lt($terapeuta->codigo_expira_en)
-
     ) {
-
         return redirect('/terapeuta')
-            ->with(
-                'pin_existente',
-                'Ya tienes un PIN activo.'
-            );
-
+            ->with('pin_existente', 'Ya tienes un PIN activo.');
     }
 
-    // Generar nuevo PIN
     $nuevoPin = rand(100000, 999999);
 
     DB::table('users')
         ->where('id', $usuarioId)
         ->update([
-
             'codigo_vinculacion' => $nuevoPin,
-
-            'codigo_expira_en' =>
-                now()->addDays(90)
-
+            'codigo_expira_en' => now()->addDays(90),
+            'updated_at' => now(),
         ]);
 
     return redirect('/terapeuta')
-        ->with(
-            'success_pin',
-            'PIN generado correctamente.'
-        );
+        ->with('success_pin', 'PIN generado correctamente.');
 
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Vincular paciente con terapeuta mediante PIN
+|--------------------------------------------------------------------------
+*/
+
 Route::post('/vincular-terapeuta', function (Request $request) {
+
+    $request->validate([
+        'codigo' => 'required|string|max:6',
+        'motivo' => 'required|string',
+    ]);
 
     $codigo = trim($request->codigo);
 
-    // Buscar terapeuta
     $terapeuta = DB::table('users')
         ->where('codigo_vinculacion', $codigo)
         ->where('terapeuta', 1)
         ->first();
 
-    // Validar PIN
     if (!$terapeuta) {
-
         return redirect('/dashboard')
-            ->with(
-                'error_vinculacion',
-                'PIN inválido.'
-            );
-
+            ->with('error_vinculacion', 'PIN inválido.');
     }
 
-    // Obtener usuario actual
+    if (
+        $terapeuta->codigo_expira_en &&
+        now()->gt($terapeuta->codigo_expira_en)
+    ) {
+        return redirect('/dashboard')
+            ->with('error_vinculacion', 'El PIN ha expirado. Solicita uno nuevo a tu terapeuta.');
+    }
+
     $usuarioId = session('usuario_id');
 
-    // Guardar vínculo
+    if (!$usuarioId) {
+        return redirect('/login');
+    }
+
     DB::table('users')
         ->where('id', $usuarioId)
         ->update([
-
             'terapeuta_id' => (int) $terapeuta->id,
-
-            'motivo_terapia' =>
-    Crypt::encryptString($request->motivo)
-
+            'motivo_terapia' => Crypt::encryptString($request->motivo),
+            'updated_at' => now(),
         ]);
 
-    // Guardar en sesión
     session([
-
         'terapeuta_vinculado' => true,
-
-        'nombre_terapeuta' =>
-            $terapeuta->nombre . ' ' . $terapeuta->apellido
-
+        'nombre_terapeuta' => $terapeuta->nombre . ' ' . $terapeuta->apellido,
     ]);
 
     return redirect('/dashboard')
-        ->with(
-            'success_vinculacion',
-            'Terapeuta vinculado exitosamente.'
-        );
+        ->with('success_vinculacion', 'Terapeuta vinculado exitosamente.');
 
 });

@@ -90,22 +90,39 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td data-label="Paciente">
-                                        <a class="table__link" href="#">María López</a>
-                                    </td>
-                                    <td data-label="Fecha">20 diciembre 2025</td>
-                                    <td data-label="Hora">10:30</td>
-                                    <td data-label="Motivo">Ansiedad laboral y problemas de sueño.</td>
-                                </tr>
-                                <tr>
-                                    <td data-label="Paciente">
-                                        <a class="table__link" href="#">Carlos Hernández</a>
-                                    </td>
-                                    <td data-label="Fecha">21 diciembre 2025</td>
-                                    <td data-label="Hora">16:00</td>
-                                    <td data-label="Motivo">Estrés por cambios personales y baja motivación.</td>
-                                </tr>
+                                @forelse ($proximasCitas as $cita)
+                                    <tr>
+                                        <td data-label="Paciente">
+                                            <a class="table__link" href="/expediente/{{ $cita->paciente_id }}">
+                                                {{ $cita->nombre }} {{ $cita->apellido }}
+                                            </a>
+                                        </td>
+
+                                        <td data-label="Fecha">
+                                            {{ \Carbon\Carbon::parse($cita->fecha)->format('d/m/Y') }}
+                                        </td>
+
+                                        <td data-label="Hora">
+                                            {{ \Carbon\Carbon::parse($cita->hora)->format('H:i') }}
+                                        </td>
+
+                                        <td data-label="Motivo">
+                                            @php
+                                                try {
+                                                    echo \Illuminate\Support\Facades\Crypt::decryptString($cita->motivo);
+                                                } catch (\Exception $e) {
+                                                    echo $cita->motivo;
+                                                }
+                                            @endphp
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="4" style="text-align:center;">
+                                            No tienes próximas citas confirmadas.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -115,12 +132,19 @@
             <!-- PENDIENTES -->
             <section class="content">
                 <h2 class="title">Citas pendientes por confirmar</h2>
+
                 <article class="card">
                     <p class="card__description">
-                        Tienes <strong>2</strong> citas pendientes por confirmar.
-                        <a class="table__link" href="/confirmar">Ir a confirmar</a>
+                        Tienes <strong>{{ $pendientesCount }}</strong>
+                        {{ $pendientesCount == 1 ? 'cita pendiente' : 'citas pendientes' }} por confirmar.
+
+                        @if ($pendientesCount > 0)
+                            <a class="table__link" href="/confirmar">
+                                Ir a confirmar
+                            </a>
+                        @endif
                     </p>
-                </article> <!-- CORRECCIÓN: Se cerró el article aquí -->
+                </article>
             </section>
 
             <!-- INVITAR PACIENTE -->

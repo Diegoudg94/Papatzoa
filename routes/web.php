@@ -22,9 +22,6 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 | Registro de usuarios
 |--------------------------------------------------------------------------
-| GET  -> muestra el formulario de registro
-| POST -> procesa el registro
-|--------------------------------------------------------------------------
 */
 
 Route::get('/registro', function () {
@@ -62,13 +59,86 @@ Route::get('/dashboard', function () {
 
 /*
 |--------------------------------------------------------------------------
-| Vistas secundarias del paciente
+| Citas del paciente
 |--------------------------------------------------------------------------
 */
 
 Route::get('/citas', function () {
-    return view('citas');
+
+    $usuarioId = session('usuario_id');
+
+    if (!$usuarioId) {
+        return redirect('/login');
+    }
+
+    $citas = DB::table('citas')
+        ->where('paciente_id', $usuarioId)
+        ->orderBy('created_at', 'desc')
+        ->get();
+
+    return view('citas', compact('citas'));
+
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| Solicitar cita
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/citas/solicitar', function (Request $request) {
+
+    $request->validate([
+        'fecha' => 'required|date',
+        'hora' => 'required',
+        'motivo' => 'required|string',
+    ]);
+
+    $usuarioId = session('usuario_id');
+
+    if (!$usuarioId) {
+        return redirect('/login');
+    }
+
+    $paciente = DB::table('users')
+        ->where('id', $usuarioId)
+        ->first();
+
+    if (!$paciente || !$paciente->terapeuta_id) {
+        return redirect('/citas')
+            ->with(
+                'error_cita',
+                'Primero debes vincularte con un terapeuta para solicitar una cita.'
+            );
+    }
+
+    DB::table('citas')->insert([
+        'paciente_id' => $paciente->id,
+        'terapeuta_id' => $paciente->terapeuta_id,
+        'fecha' => $request->fecha,
+        'hora' => $request->hora,
+        'motivo' => Crypt::encryptString($request->motivo),
+        'estado' => 'pendiente',
+        'comentario_terapeuta' => null,
+        'created_at' => now(),
+        'updated_at' => now(),
+    ]);
+
+    return redirect('/citas')
+        ->with(
+            'success_cita',
+            'Tu solicitud de cita fue enviada. El terapeuta la confirmará en cuanto sea posible.'
+        );
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Vistas secundarias del paciente
+|--------------------------------------------------------------------------
+*/
 
 Route::get('/diario', function () {
     return view('diario');
@@ -86,11 +156,153 @@ Route::get('/ayuda', function () {
 */
 
 Route::get('/terapeuta', function () {
-    return view('terapeuta');
+
+    $terapeutaId = session('usuario_id');
+
+    if (!$terapeutaId) {
+        return redirect('/login');
+    }
+
+    // Citas aceptadas / próximas citas reales
+    $proximasCitas = DB::table('citas')
+        ->join('users', 'citas.paciente_id', '=', 'users.id')
+        ->where(function ($query) use ($terapeutaId) {
+            $query->where('citas.terapeuta_id', (int) $terapeutaId)
+                  ->orWhere('citas.terapeuta_id', (string) $terapeutaId);
+        })
+        ->where('citas.estado', 'aceptada')
+        ->select(
+            'citas.id',
+            'citas.fecha',
+            'citas.hora',
+            'citas.motivo',
+            'users.id as paciente_id',
+            'users.nombre',
+            'users.apellido'
+        )
+        ->orderBy('citas.fecha', 'asc')
+        ->orderBy('citas.hora', 'asc')
+        ->get();
+
+    // Número real de citas pendientes
+    $pendientesCount = DB::table('citas')
+        ->where(function ($query) use ($terapeutaId) {
+            $query->where('terapeuta_id', (int) $terapeutaId)
+                  ->orWhere('terapeuta_id', (string) $terapeutaId);
+        })
+        ->where('estado', 'pendiente')
+        ->count();
+
+    return view('terapeuta', compact('proximasCitas', 'pendientesCount'));
+
 });
 
+
+/*
+|--------------------------------------------------------------------------
+| Confirmar citas del terapeuta
+|--------------------------------------------------------------------------
+*/
+
 Route::get('/confirmar', function () {
-    return view('confirmar');
+
+    $terapeutaId = session('usuario_id');
+
+    if (!$terapeutaId) {
+        return redirect('/login');
+    }
+
+    $solicitudes = DB::table('citas')
+        ->join('users', 'citas.paciente_id', '=', 'users.id')
+        ->where(function ($query) use ($terapeutaId) {
+            $query->where('citas.terapeuta_id', (int) $terapeutaId)
+                  ->orWhere('citas.terapeuta_id', (string) $terapeutaId);
+        })
+        ->where('citas.estado', 'pendiente')
+       ->select(
+    'citas.id',
+    'citas.fecha',
+    'citas.hora',
+    'citas.motivo',
+    'citas.estado',
+    'users.id as paciente_id',
+    'users.nombre',
+    'users.apellido'
+)
+        ->orderBy('citas.created_at', 'desc')
+        ->get();
+
+    return view('confirmar', compact('solicitudes'));
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Aceptar cita
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/citas/{id}/aceptar', function ($id) {
+
+    $terapeutaId = session('usuario_id');
+
+    if (!$terapeutaId) {
+        return redirect('/login');
+    }
+
+    DB::table('citas')
+        ->where('id', $id)
+        ->where(function ($query) use ($terapeutaId) {
+            $query->where('terapeuta_id', (int) $terapeutaId)
+                  ->orWhere('terapeuta_id', (string) $terapeutaId);
+        })
+        ->update([
+            'estado' => 'aceptada',
+            'updated_at' => now(),
+        ]);
+
+    return redirect('/confirmar')
+        ->with('success_confirmar', 'Cita aceptada correctamente.');
+
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| Rechazar cita
+|--------------------------------------------------------------------------
+*/
+
+Route::post('/citas/{id}/rechazar', function (Request $request, $id) {
+
+    $terapeutaId = session('usuario_id');
+
+    if (!$terapeutaId) {
+        return redirect('/login');
+    }
+
+    $comentario = null;
+
+    if ($request->comentario) {
+        $comentario = Crypt::encryptString($request->comentario);
+    }
+
+    DB::table('citas')
+        ->where('id', $id)
+        ->where(function ($query) use ($terapeutaId) {
+            $query->where('terapeuta_id', (int) $terapeutaId)
+                  ->orWhere('terapeuta_id', (string) $terapeutaId);
+        })
+        ->update([
+            'estado' => 'rechazada',
+            'comentario_terapeuta' => $comentario,
+            'updated_at' => now(),
+        ]);
+
+    return redirect('/confirmar')
+        ->with('success_confirmar', 'Cita rechazada correctamente.');
+
 });
 
 

@@ -2,11 +2,6 @@
 <html lang="es">
 
 <head>
-
-  <!-- ===================================== -->
-  <!-- CONFIGURACIÓN BÁSICA -->
-  <!-- ===================================== -->
-
   <meta charset="UTF-8" />
 
   <meta
@@ -16,31 +11,19 @@
 
   <title>Confirmar citas</title>
 
-  <!--
-    CSS principal
-    
-    Laravel busca este archivo en:
-    
-    public/css/terapeuta.css
-  -->
   <link
     rel="stylesheet"
     href="{{ asset('css/terapeuta.css') }}"
   />
-
 </head>
 
 <body>
 
-  <!-- ===================================== -->
   <!-- HEADER -->
-  <!-- ===================================== -->
-
   <header class="header">
 
     <div class="header__container">
 
-      <!-- Logo / título -->
       <a class="brand" href="/terapeuta">
 
         <span
@@ -56,8 +39,6 @@
 
       </a>
 
-
-      <!-- Navegación -->
       <nav
         class="header__center"
         aria-label="Navegación principal"
@@ -72,8 +53,6 @@
 
       </nav>
 
-
-      <!-- Acciones usuario -->
       <nav
         class="header__actions"
         aria-label="Acciones de usuario"
@@ -93,21 +72,12 @@
   </header>
 
 
-  <!-- ===================================== -->
   <!-- CONTENIDO PRINCIPAL -->
-  <!-- ===================================== -->
-
   <main class="main">
 
     <div class="main__container">
 
-      <!-- Hero decorativo -->
       <section class="hero"></section>
-
-
-      <!-- ===================================== -->
-      <!-- TABLA DE CITAS -->
-      <!-- ===================================== -->
 
       <section class="content">
 
@@ -115,22 +85,31 @@
           Citas pendientes por confirmar
         </h1>
 
-
         <article class="card">
 
           <p
             class="card__description"
             style="margin-bottom: 12px;"
           >
-            Confirma o rechaza citas solicitadas por pacientes.
-
-            También puedes enviar un comentario opcional.
+            Aquí aparecerán las solicitudes de cita enviadas por tus pacientes vinculados.
+            Puedes aceptar o rechazar cada solicitud.
           </p>
 
-
-          <!-- ===================================== -->
-          <!-- TABLA -->
-          <!-- ===================================== -->
+          @if (session('success_confirmar'))
+            <div
+              class="card__description"
+              style="
+                margin-bottom: 16px;
+                padding: 12px;
+                border-radius: 12px;
+                background: #dcfce7;
+                color: #166534;
+                border: 1px solid #86efac;
+              "
+            >
+              {{ session('success_confirmar') }}
+            </div>
+          @endif
 
           <div class="table-wrap">
 
@@ -139,180 +118,115 @@
               aria-label="Tabla de citas pendientes por confirmar"
             >
 
-              <!-- ENCABEZADOS -->
               <thead>
-
                 <tr>
-
                   <th>Paciente</th>
-
-                  <th>Fecha</th>
-
-                  <th>Hora</th>
-
+                  <th>Fecha solicitada</th>
+                  <th>Hora tentativa</th>
                   <th>Motivo / descripción</th>
-
                   <th>Acciones</th>
-
                 </tr>
-
               </thead>
 
-
-              <!-- CUERPO -->
               <tbody>
 
+                @forelse ($solicitudes as $solicitud)
 
-                <!-- ===================== -->
-                <!-- CITA 1 -->
-                <!-- ===================== -->
+                  <tr>
 
-                <tr>
-
-                  <td data-label="Paciente">
-
-                    <a
-                      class="table__link"
-                      href="#"
-                    >
-                      María López
-                    </a>
-
-                  </td>
-
-                  <td data-label="Fecha">
-                    23 diciembre 2025
-                  </td>
-
-                  <td data-label="Hora">
-                    09:00
-                  </td>
-
-                  <td data-label="Motivo">
-                    Ansiedad laboral y problemas de sueño.
-                  </td>
-
-                  <td data-label="Acciones">
-
-                    <div class="actions">
-
-                      <!-- Botón aceptar -->
-                      <button
-                        class="btn btn--accept"
-                        type="button"
+                    <td data-label="Paciente">
+                      <a
+                        class="table__link"
+                        href="/expediente/{{ $solicitud->paciente_id }}"
                       >
-                        Aceptar
-                      </button>
+                        {{ $solicitud->nombre }} {{ $solicitud->apellido }}
+                      </a>
+                    </td>
 
+                    <td data-label="Fecha solicitada">
+                      {{ $solicitud->fecha }}
+                    </td>
 
-                      <!-- Botón rechazar -->
-                      <button
-                        class="btn btn--reject"
-                        type="button"
-                      >
-                        Rechazar
-                      </button>
+                    <td data-label="Hora tentativa">
+                      {{ $solicitud->hora }}
+                    </td>
 
+                    <td data-label="Motivo">
+                      @php
+                        try {
+                            echo \Illuminate\Support\Facades\Crypt::decryptString($solicitud->motivo);
+                        } catch (\Exception $e) {
+                            echo $solicitud->motivo;
+                        }
+                      @endphp
+                    </td>
 
-                      <!-- Comentario -->
-                      <div class="comment">
+                    <td data-label="Acciones">
 
-                        <input
-                          class="comment__input"
-                          type="text"
-                          placeholder="Comentario (opcional)"
-                        />
+                      <div class="actions">
 
-                        <button
-                          class="btn btn--comment"
-                          type="button"
+                        <!-- ACEPTAR CITA -->
+                        <form
+                          action="/citas/{{ $solicitud->id }}/aceptar"
+                          method="POST"
                         >
-                          Enviar comentario
-                        </button>
+                          @csrf
+
+                          <button
+                            class="btn btn--accept"
+                            type="submit"
+                          >
+                            Aceptar
+                          </button>
+
+                        </form>
+
+
+                        <!-- RECHAZAR CITA -->
+                        <form
+                          action="/citas/{{ $solicitud->id }}/rechazar"
+                          method="POST"
+                        >
+                          @csrf
+
+                          <div class="comment">
+
+                            <input
+                              class="comment__input"
+                              type="text"
+                              name="comentario"
+                              placeholder="Comentario opcional"
+                            />
+
+                            <button
+                              class="btn btn--reject"
+                              type="submit"
+                            >
+                              Rechazar
+                            </button>
+
+                          </div>
+
+                        </form>
 
                       </div>
 
-                    </div>
+                    </td>
 
-                  </td>
+                  </tr>
 
-                </tr>
+                @empty
 
-
-                <!-- ===================== -->
-                <!-- CITA 2 -->
-                <!-- ===================== -->
-
-                <tr>
-
-                  <td data-label="Paciente">
-
-                    <a
-                      class="table__link"
-                      href="#"
+                  <tr>
+                    <td
+                      colspan="5"
+                      style="text-align:center;"
                     >
-                      Carlos Hernández
-                    </a>
+                      No tienes citas pendientes por confirmar.
+                    </td>
+                  </tr>
 
-                  </td>
-
-                  <td data-label="Fecha">
-                    24 diciembre 2025
-                  </td>
-
-                  <td data-label="Hora">
-                    15:30
-                  </td>
-
-                  <td data-label="Motivo">
-                    Estrés por cambios personales y baja motivación.
-                  </td>
-
-                  <td data-label="Acciones">
-
-                    <div class="actions">
-
-                      <!-- Botón aceptar -->
-                      <button
-                        class="btn btn--accept"
-                        type="button"
-                      >
-                        Aceptar
-                      </button>
-
-
-                      <!-- Botón rechazar -->
-                      <button
-                        class="btn btn--reject"
-                        type="button"
-                      >
-                        Rechazar
-                      </button>
-
-
-                      <!-- Comentario -->
-                      <div class="comment">
-
-                        <input
-                          class="comment__input"
-                          type="text"
-                          placeholder="Comentario (opcional)"
-                        />
-
-                        <button
-                          class="btn btn--comment"
-                          type="button"
-                        >
-                          Enviar comentario
-                        </button>
-
-                      </div>
-
-                    </div>
-
-                  </td>
-
-                </tr>
+                @endforelse
 
               </tbody>
 

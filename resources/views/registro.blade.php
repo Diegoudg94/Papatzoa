@@ -44,7 +44,7 @@
     Serás redirigido a la página de inicio de sesión en
 
     <span id="countdown">
-      10
+      5
     </span>
 
     segundos...
@@ -292,7 +292,7 @@
   if (countdownElement)
   {
 
-    let segundos = 10;
+    let segundos = 5;
 
     const intervalo = setInterval(() =>
     {

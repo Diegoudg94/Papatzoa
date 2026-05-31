@@ -89,12 +89,8 @@ class UsuarioController extends Controller
         // REDIRECCIÓN
         // =========================
 
-        return redirect('/')
-
-            ->with(
-                'success',
-                'Usuario registrado exitosamente.'
-            );
+    return redirect('/registro')
+    ->with('success', 'Usuario registrado exitosamente.');
 
     }
 

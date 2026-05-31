@@ -64,7 +64,53 @@
                 
                 @csrf
                 -> token de seguridad obligatorio en Laravel
-            -->
+ 
+                -->
+                @if (session('registro_exitoso'))
+
+  <div
+    style="
+      background:#dcfce7;
+      color:#166534;
+      padding:16px;
+      border-radius:10px;
+      margin-bottom:16px;
+      border:1px solid #86efac;
+      line-height:1.6;
+      font-weight:700;
+    "
+  >
+    <strong>
+      {{ session('registro_exitoso') }}
+    </strong>
+
+    <br>
+
+    <span style="font-weight:500;">
+      Serás redirigido a la página de inicio de sesión en
+      <span id="countdownLogin">5</span>
+      segundos...
+    </span>
+  </div>
+
+  <script>
+    let segundosLogin = 5;
+
+    const countdownLogin = document.getElementById('countdownLogin');
+
+    const intervaloLogin = setInterval(() => {
+      segundosLogin--;
+
+      countdownLogin.textContent = segundosLogin;
+
+      if (segundosLogin <= 0) {
+        clearInterval(intervaloLogin);
+        window.location.href = '/login';
+      }
+    }, 1000);
+  </script>
+
+@endif
 @if ($errors->any())
 
   <div
@@ -212,7 +258,7 @@
                     ¿No tienes cuenta?
 
                     <!-- Redirección al registro -->
-                    <a class="form__link" href="/">
+                    <a class="form__link" href="/registro">
                         Crear cuenta
                     </a>
 

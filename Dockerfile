@@ -19,9 +19,9 @@ RUN cp .env.example .env
 
 RUN touch database/database.sqlite
 
-RUN php artisan key:generate
+#RUN php artisan key:generate
 
-RUN php artisan migrate --force
+# RUN php artisan migrate --force
 
 RUN chown -R www-data:www-data storage bootstrap/cache database
 

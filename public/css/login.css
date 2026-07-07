@@ -116,6 +116,45 @@ body {
   transform: scale(0.99);
 }
 
+.button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.button--google {
+  background-color: #ffffff;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.form__divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 18px 0;
+  color: #6b7280;
+}
+
+.form__divider span {
+  height: 1px;
+  flex: 1;
+  background: #e5e7eb;
+}
+
+.auth-message {
+  display: none;
+  padding: 12px;
+  border-radius: 8px;
+  margin-top: 16px;
+  line-height: 1.5;
+}
+
+.auth-message--error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fca5a5;
+}
+
 .form__footer {
   margin-top: 14px;
   text-align: center;

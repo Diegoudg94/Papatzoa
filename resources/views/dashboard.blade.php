@@ -83,7 +83,19 @@
       <!-- SECCIÓN 2: VINCULACIÓN CON TERAPEUTA -->
       <section class="content" style="margin-top: 2rem;">
         <article class="card">
-          @if (!session('terapeuta_vinculado'))
+          @if (session('success_vinculacion'))
+            <div style="background:#dcfce7; color:#166534; padding:14px; border-radius:10px; margin-bottom:18px; border:1px solid #86efac;">
+              {{ session('success_vinculacion') }}
+            </div>
+          @endif
+
+          @if (session('error_vinculacion'))
+            <div style="background:#fee2e2; color:#991b1b; padding:14px; border-radius:10px; margin-bottom:18px; border:1px solid #fca5a5;">
+              {{ session('error_vinculacion') }}
+            </div>
+          @endif
+
+          @if (!$terapeuta)
             <h2 class="card__title">Vincular terapeuta</h2>
             <p class="card__description" style="margin-bottom:18px;">
               Aún no tienes un terapeuta vinculado.
@@ -91,19 +103,6 @@
             <p style="margin-bottom:20px; color:#6b7280; line-height:1.7;">
               Ingresa el PIN de vinculación proporcionado por tu terapeuta para conectar tu cuenta.
             </p>
-
-            <!-- Mensajes de Estado -->
-            @if (session('success_vinculacion'))
-              <div style="background:#dcfce7; color:#166534; padding:14px; border-radius:10px; margin-bottom:18px; border:1px solid #86efac;">
-                {{ session('success_vinculacion') }}
-              </div>
-            @endif
-
-            @if (session('error_vinculacion'))
-              <div style="background:#fee2e2; color:#991b1b; padding:14px; border-radius:10px; margin-bottom:18px; border:1px solid #fca5a5;">
-                {{ session('error_vinculacion') }}
-              </div>
-            @endif
 
             <!-- Formulario Corregido -->
             <form action="/vincular-terapeuta" method="POST">
@@ -130,10 +129,157 @@
             </form>
 
           @else
+            @php
+              $nombreCompletoTerapeuta = trim(($terapeuta->nombre ?? '') . ' ' . ($terapeuta->apellido ?? ''));
+              $nombreCompletoTerapeuta = $nombreCompletoTerapeuta !== '' ? $nombreCompletoTerapeuta : 'Terapeuta';
+              $inicialesTerapeuta = strtoupper(substr($terapeuta->nombre ?? 'T', 0, 1) . substr($terapeuta->apellido ?? '', 0, 1));
+              $fotoTerapeuta = null;
+
+              if (!empty($terapeuta->profile_photo_path)) {
+                  $fotoTerapeuta = asset('storage/' . ltrim($terapeuta->profile_photo_path, '/'));
+              } elseif (!empty($terapeuta->avatar_url)) {
+                  $fotoTerapeuta = $terapeuta->avatar_url;
+              }
+
+              $estadoVerificacion = strtolower((string) ($terapeuta->estado_verificacion ?? ''));
+              $badgeLabel = 'No enviada';
+              $badgeClass = 'verification-badge--no-enviada';
+
+              if ((bool) ($terapeuta->terapeuta_verificado ?? false) || in_array($estadoVerificacion, ['aprobado', 'aprobada', 'verificado', 'verificada'], true)) {
+                  $badgeLabel = 'Aprobado / Verificado';
+                  $badgeClass = 'verification-badge--aprobada';
+              } elseif (in_array($estadoVerificacion, ['rechazado', 'rechazada'], true)) {
+                  $badgeLabel = 'Rechazado';
+                  $badgeClass = 'verification-badge--rechazada';
+              } elseif (in_array($estadoVerificacion, ['pendiente', 'en_revision', 'en revisión'], true)) {
+                  $badgeLabel = 'Pendiente';
+                  $badgeClass = 'verification-badge--pendiente';
+              }
+
+              $telefonoCompleto = trim(($terapeuta->telefono_lada ?? '') . ' ' . ($terapeuta->telefono ?? ''));
+              $modalidadAtencion = $terapeuta->modalidad_atencion ?? null;
+              $modalidadNormalizada = strtolower((string) $modalidadAtencion);
+              $mostrarLugarAtencion = in_array($modalidadNormalizada, ['presencial', 'hibrida', 'híbrida'], true);
+              $direccionCompleta = implode(', ', array_filter([
+                  $terapeuta->direccion_atencion ?? null,
+                  $terapeuta->ciudad_atencion ?? null,
+                  $terapeuta->estado_atencion ?? null,
+                  $terapeuta->pais_atencion ?? null,
+                  $terapeuta->codigo_postal_atencion ?? null,
+              ]));
+            @endphp
+
             <h2 class="card__title">Tu terapeuta</h2>
             <p class="card__description">
-              Actualmente estás vinculado con: <strong>{{ session('nombre_terapeuta') }}</strong>
+              Actualmente estás vinculado con:
+              <button type="button" class="therapist-profile-link" id="openTherapistModal">
+                {{ $nombreCompletoTerapeuta }}
+              </button>
             </p>
+
+            <div class="therapist-modal" id="therapistModal" role="dialog" aria-modal="true" aria-labelledby="therapistModalTitle" aria-hidden="true">
+              <div class="therapist-modal__overlay" data-close-therapist-modal></div>
+              <div class="therapist-modal__content" tabindex="-1">
+                <button type="button" class="therapist-modal__close" id="closeTherapistModal" aria-label="Cerrar perfil del terapeuta">
+                  &times;
+                </button>
+
+                <h2 class="therapist-modal__title" id="therapistModalTitle">Perfil del terapeuta</h2>
+
+                <div class="therapist-modal__header">
+                  @if ($fotoTerapeuta)
+                    <img class="therapist-modal__avatar" src="{{ $fotoTerapeuta }}" alt="Foto de {{ $nombreCompletoTerapeuta }}">
+                  @else
+                    <div class="therapist-modal__avatar therapist-modal__avatar--initials" aria-hidden="true">
+                      {{ $inicialesTerapeuta }}
+                    </div>
+                  @endif
+
+                  <div>
+                    <h3 class="therapist-modal__name">{{ $nombreCompletoTerapeuta }}</h3>
+                    @if (!empty($terapeuta->correo))
+                      <p class="therapist-modal__email">{{ $terapeuta->correo }}</p>
+                    @endif
+                    <span class="verification-badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
+                  </div>
+                </div>
+
+                <div class="therapist-modal__grid">
+                  @if (!empty($terapeuta->especialidad))
+                    <div class="therapist-info-item">
+                      <span>Especialidad</span>
+                      <strong>{{ $terapeuta->especialidad }}</strong>
+                    </div>
+                  @endif
+
+                  @if (!empty($terapeuta->experiencia_anios))
+                    <div class="therapist-info-item">
+                      <span>Años de experiencia</span>
+                      <strong>{{ $terapeuta->experiencia_anios }}</strong>
+                    </div>
+                  @endif
+
+                  @if (!empty($modalidadAtencion))
+                    <div class="therapist-info-item">
+                      <span>Modalidad de terapia</span>
+                      <strong>{{ $modalidadAtencion }}</strong>
+                    </div>
+                  @endif
+
+                  @if (!empty($terapeuta->nacionalidad))
+                    <div class="therapist-info-item">
+                      <span>Nacionalidad</span>
+                      <strong>{{ $terapeuta->nacionalidad }}</strong>
+                    </div>
+                  @endif
+
+                  @if ($telefonoCompleto !== '')
+                    <div class="therapist-info-item">
+                      <span>Teléfono de contacto</span>
+                      <strong>{{ $telefonoCompleto }}</strong>
+                    </div>
+                  @endif
+
+                  @if (!empty($terapeuta->cedula_profesional))
+                    <div class="therapist-info-item">
+                      <span>Cédula profesional</span>
+                      <strong>{{ $terapeuta->cedula_profesional }}</strong>
+                    </div>
+                  @endif
+
+                  @if (!empty($terapeuta->institucion_formacion))
+                    <div class="therapist-info-item">
+                      <span>Institución de formación</span>
+                      <strong>{{ $terapeuta->institucion_formacion }}</strong>
+                    </div>
+                  @endif
+
+                  @if (!empty($terapeuta->enfoque_terapeutico))
+                    <div class="therapist-info-item">
+                      <span>Enfoque terapéutico</span>
+                      <strong>{{ $terapeuta->enfoque_terapeutico }}</strong>
+                    </div>
+                  @endif
+                </div>
+
+                @if (!empty($terapeuta->biografia))
+                  <div class="therapist-info-item therapist-info-item--full">
+                    <span>Biografía</span>
+                    <p>{{ $terapeuta->biografia }}</p>
+                  </div>
+                @endif
+
+                <div class="therapist-info-item therapist-info-item--full">
+                  @if ($mostrarLugarAtencion)
+                    <span>Lugar de atención</span>
+                    <p>{{ $direccionCompleta !== '' ? $direccionCompleta : 'No especificado' }}</p>
+                  @else
+                    <span>Atención en línea</span>
+                    <p>Sesiones disponibles en modalidad online.</p>
+                  @endif
+                </div>
+              </div>
+            </div>
           @endif
         </article>
       </section>
@@ -145,14 +291,79 @@
     const menuButton = document.getElementById('menuButton');
     const dropdownMenu = document.getElementById('dropdownMenu');
 
-    menuButton.addEventListener('click', (e) => {
-      e.stopPropagation();
-      dropdownMenu.classList.toggle('show');
+    if (menuButton && dropdownMenu) {
+      menuButton.addEventListener('click', (e) => {
+        e.stopPropagation();
+        dropdownMenu.classList.toggle('show');
+      });
+
+      window.addEventListener('click', (e) => {
+        if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+          dropdownMenu.classList.remove('show');
+        }
+      });
+    }
+
+    const modal = document.getElementById('therapistModal');
+    const openBtn = document.getElementById('openTherapistModal');
+    const closeBtn = document.getElementById('closeTherapistModal');
+    const overlay = modal?.querySelector('.therapist-modal__overlay');
+
+    let scrollY = 0;
+
+    function openModal() {
+      if (!modal) return;
+
+      scrollY = window.scrollY || document.documentElement.scrollTop;
+
+      modal.classList.add('is-open');
+      modal.setAttribute('aria-hidden', 'false');
+      document.body.classList.add('modal-open');
+      document.body.style.top = `-${scrollY}px`;
+
+      const content = modal.querySelector('.therapist-modal__content');
+      if (content) {
+        content.scrollTop = 0;
+      }
+
+      closeBtn?.focus();
+    }
+
+    function closeModal() {
+      if (!modal) return;
+
+      modal.classList.remove('is-open');
+      modal.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('modal-open');
+      document.body.style.top = '';
+
+      window.scrollTo(0, scrollY);
+      openBtn?.focus();
+    }
+
+    openBtn?.addEventListener('click', function (event) {
+      event.preventDefault();
+      openModal();
     });
 
-    window.addEventListener('click', (e) => {
-      if (!menuButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
-        dropdownMenu.classList.remove('show');
+    closeBtn?.addEventListener('click', function (event) {
+      event.preventDefault();
+      closeModal();
+    });
+
+    overlay?.addEventListener('click', closeModal);
+
+    overlay?.addEventListener('wheel', function (event) {
+      event.preventDefault();
+    }, { passive: false });
+
+    overlay?.addEventListener('touchmove', function (event) {
+      event.preventDefault();
+    }, { passive: false });
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape' && modal?.classList.contains('is-open')) {
+          closeModal();
       }
     });
   </script>

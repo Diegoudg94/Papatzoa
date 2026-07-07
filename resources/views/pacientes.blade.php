@@ -85,19 +85,19 @@
         <!-- TABLA DINÁMICA -->
         <!-- ===================================== -->
 
-        <article class="card">
-          <div class="table-wrap">
+        <article class="card clinical-table-card">
+          <div class="table-wrap clinical-table-wrap">
 
-            <table class="table" aria-label="Tabla de pacientes">
+            <table class="table clinical-table clinical-table--patients" aria-label="Tabla de pacientes">
 
               <!-- ENCABEZADOS -->
               <thead>
                 <tr>
                   <th>Paciente</th>
-                  <th>Fecha de Inicio</th>
-                  <th>Próxima Cita</th>
+                  <th class="cell-center">Fecha de inicio</th>
+                  <th class="cell-center">Próxima cita</th>
                   <th>Motivo de consulta</th>
-                  <th>Estado</th>
+                  <th class="cell-center">Estado</th>
                 </tr>
               </thead>
 
@@ -107,31 +107,28 @@
                 @forelse ($pacientes as $paciente)
                 <tr>
                   <!-- Nombre -->
-                  <td data-label="Paciente">
-                    <a
-    class="table__link"
-    href="/expediente/{{ $paciente->id }}"
->
-    {{ $paciente->nombre }} {{ $paciente->apellido }}
-</a>
+                  <td class="cell-patient" data-label="Paciente">
+                    <a class="table__link" href="/expediente/{{ $paciente->id }}">
+                      {{ $paciente->nombre }} {{ $paciente->apellido }}
+                    </a>
                   </td>
 
                   <!-- Fecha inicio -->
-                  <td data-label="Inicio">
+                  <td class="cell-center cell-nowrap" data-label="Inicio">
                     {{ $paciente->updated_at ? \Carbon\Carbon::parse($paciente->updated_at)->format('d/m/Y') : '—' }}
                   </td>
 
                   <!-- Próxima cita (Ejemplo de lógica para relación) -->
-                  <td data-label="Próxima cita">
+                  <td class="cell-center cell-nowrap" data-label="Próxima cita">
                     @if(isset($paciente->proxima_cita))
-                      {{ \Carbon\Carbon::parse($paciente->proxima_cita)->format('d/m/Y — H:i') }}
+                      {{ \Carbon\Carbon::parse($paciente->proxima_cita)->format('d/m/Y H:i') }}
                     @else
                       —
                     @endif
                   </td>
 
                   <!-- Motivo -->
-                  <td data-label="Razón">
+                  <td class="cell-text" data-label="Razón">
                     @php
                         $motivo = $paciente->motivo_terapia;
                         if ($motivo) {
@@ -146,15 +143,15 @@
                   </td>
 
                   <!-- Estado -->
-                  <td data-label="Estado">
-                    <span class="score score--mid">
+                  <td class="cell-center" data-label="Estado">
+                    <span class="status-badge status-badge--active">
                       Activo
                     </span>
                   </td>
                 </tr>
                 @empty
                 <tr>
-                  <td colspan="5" style="text-align: center; padding: 2rem; color: #6b7280;">
+                  <td class="table-empty-state" colspan="5">
                     Aún no tienes pacientes vinculados a tu cuenta.
                   </td>
                 </tr>

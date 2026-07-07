@@ -1,4 +1,8 @@
 /* Header - azul calmado */
+html {
+  scrollbar-gutter: stable;
+}
+
 .header {
   background: #eaf0ff;            /* azul muy suave, sensación de calma */
   border-bottom: 1px solid #dbe7ff;
@@ -137,10 +141,6 @@
 .card:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.08);
-}
-
-.card__image {
-  transition: background-color 0.2s ease;
 }
 
 .card:hover .card__image {
@@ -432,4 +432,270 @@
   box-shadow:
     0 8px 20px rgba(79, 70, 229, 0.08);
 
+}
+
+.therapist-profile-link {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #2563eb;
+  font: inherit;
+  font-weight: 800;
+  padding: 0;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+}
+
+.therapist-profile-link:hover,
+.therapist-profile-link:focus {
+  color: #1d4ed8;
+}
+
+.therapist-profile-link:focus {
+  outline: 3px solid rgba(37, 99, 235, 0.22);
+  outline-offset: 4px;
+  border-radius: 6px;
+}
+
+.therapist-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  overflow: hidden;
+  cursor: default;
+  overscroll-behavior: none;
+}
+
+.therapist-modal.is-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.therapist-modal__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  cursor: pointer;
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.therapist-modal__content {
+  position: relative;
+  z-index: 1;
+  width: min(720px, calc(100% - 32px));
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 24px;
+  padding: 30px;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.25);
+  -webkit-overflow-scrolling: touch;
+}
+
+.therapist-modal__close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid #e5e7eb;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 26px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.therapist-modal__close:hover,
+.therapist-modal__close:focus {
+  background: #f3f4f6;
+  outline: none;
+}
+
+.therapist-modal__title {
+  margin: 0 44px 22px 0;
+  color: #111827;
+  font-size: 1.45rem;
+  font-weight: 800;
+}
+
+.therapist-modal__header {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  padding-bottom: 24px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.therapist-modal__avatar {
+  width: 92px;
+  height: 92px;
+  border-radius: 22px;
+  object-fit: cover;
+  border: 1px solid #dbe7ff;
+  background: #eef2ff;
+  flex: 0 0 auto;
+}
+
+.therapist-modal__avatar--initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #1e3a8a;
+  font-size: 1.6rem;
+  font-weight: 800;
+}
+
+.therapist-modal__name {
+  margin: 0 0 6px;
+  color: #111827;
+  font-size: 1.25rem;
+  font-weight: 800;
+}
+
+.therapist-modal__email {
+  margin: 0 0 12px;
+  color: #4b5563;
+  overflow-wrap: anywhere;
+}
+
+.therapist-modal__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 14px;
+}
+
+.therapist-info-item {
+  padding: 15px;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  background: #f9fafb;
+}
+
+.therapist-info-item span {
+  display: block;
+  margin-bottom: 6px;
+  color: #6b7280;
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.therapist-info-item strong,
+.therapist-info-item p {
+  margin: 0;
+  color: #111827;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
+.therapist-info-item--full {
+  margin-top: 14px;
+}
+
+.verification-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  padding: 7px 11px;
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 800;
+  border: 1px solid transparent;
+}
+
+.verification-badge--pendiente {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.verification-badge--aprobada {
+  background: #dcfce7;
+  color: #166534;
+  border-color: #86efac;
+}
+
+.verification-badge--rechazada {
+  background: #fee2e2;
+  color: #991b1b;
+  border-color: #fca5a5;
+}
+
+.verification-badge--no-enviada {
+  background: #f3f4f6;
+  color: #374151;
+  border-color: #e5e7eb;
+}
+
+body.modal-open {
+  overflow: hidden !important;
+  position: fixed;
+  width: 100%;
+}
+
+body.modal-open .card,
+body.modal-open .card__image,
+body.modal-open .dropdown__item {
+  transition: none !important;
+}
+
+body.modal-open .card:hover {
+  transform: none;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.06);
+}
+
+body.modal-open .card:hover .card__image {
+  background-color: #eaf0ff;
+}
+
+body.modal-open .therapist-modal__overlay,
+body.modal-open .therapist-modal__overlay:hover {
+  background: rgba(15, 23, 42, 0.55);
+}
+
+@media (max-width: 640px) {
+  .therapist-modal__content {
+    max-height: calc(100vh - 28px);
+    padding: 24px 18px;
+    border-radius: 18px;
+  }
+
+  .therapist-modal__header {
+    align-items: flex-start;
+  }
+
+  .therapist-modal__avatar {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+  }
+
+  .therapist-modal__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -53,6 +53,22 @@
 
 @endif
 
+  @if(session('google_login_error'))
+    <div
+      style="
+        background:#fee2e2;
+        color:#991b1b;
+        padding:12px;
+        border-radius:8px;
+        margin-bottom:16px;
+        border:1px solid #fca5a5;
+        line-height:1.5;
+      "
+    >
+      {{ session('google_login_error') }}
+    </div>
+  @endif
+
   <!-- Errores -->
   @if ($errors->any())
     <div
@@ -266,6 +282,27 @@
     <button class="button" type="submit">
       Registrarme
     </button>
+
+    <div style="display:flex; align-items:center; gap:12px; margin:18px 0; color:#6b7280;">
+      <span style="height:1px; background:#e5e7eb; flex:1;"></span>
+      <span>o</span>
+      <span style="height:1px; background:#e5e7eb; flex:1;"></span>
+    </div>
+
+    <a
+      class="button"
+      href="/registro/google"
+      style="
+        display:block;
+        text-align:center;
+        text-decoration:none;
+        background:#ffffff;
+        color:#111827;
+        border:1px solid #d1d5db;
+      "
+    >
+      Registrarme con Google
+    </a>
 
   </fieldset>
 

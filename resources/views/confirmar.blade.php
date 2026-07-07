@@ -73,168 +73,146 @@
 
 
   <!-- CONTENIDO PRINCIPAL -->
-  <main class="main">
+  <main class="confirmar-citas-page">
 
-    <div class="main__container">
+    <div class="confirmar-citas-container">
 
-      <section class="hero"></section>
+      <header class="confirmar-citas-header">
 
-      <section class="content">
-
-        <h1 class="title">
+        <h1 class="confirmar-citas-title">
           Citas pendientes por confirmar
         </h1>
 
-        <article class="card">
+        <p class="confirmar-citas-subtitle">
+          Aquí aparecerán las solicitudes de cita enviadas por tus pacientes vinculados.
+          Puedes aceptar o rechazar cada solicitud.
+        </p>
 
-          <p
-            class="card__description"
-            style="margin-bottom: 12px;"
-          >
-            Aquí aparecerán las solicitudes de cita enviadas por tus pacientes vinculados.
-            Puedes aceptar o rechazar cada solicitud.
-          </p>
+      </header>
 
-          @if (session('success_confirmar'))
-            <div
-              class="card__description"
-              style="
-                margin-bottom: 16px;
-                padding: 12px;
-                border-radius: 12px;
-                background: #dcfce7;
-                color: #166534;
-                border: 1px solid #86efac;
-              "
-            >
-              {{ session('success_confirmar') }}
+      @if (session('success_confirmar'))
+        <div class="confirmar-citas-alert">
+          {{ session('success_confirmar') }}
+        </div>
+      @endif
+
+      <section
+        class="appointment-request-list"
+        aria-label="Solicitudes de citas pendientes por confirmar"
+      >
+
+        @forelse ($solicitudes as $solicitud)
+
+          @php
+            $motivoCifrado = $solicitud->motivo_encrypted ?? $solicitud->motivo ?? null;
+
+            try {
+                $motivo = $motivoCifrado
+                    ? \Illuminate\Support\Facades\Crypt::decryptString($motivoCifrado)
+                    : 'Sin registro';
+            } catch (\Exception $e) {
+                $motivo = 'No se pudo mostrar este dato.';
+            }
+          @endphp
+
+          <article class="appointment-request-card">
+
+            <div class="appointment-request-grid">
+
+              <div class="appointment-request-info appointment-request-info--patient">
+                <span class="appointment-request-label">Paciente</span>
+
+                <a
+                  class="appointment-request-patient"
+                  href="/expediente/{{ $solicitud->paciente_id }}"
+                >
+                  {{ $solicitud->nombre }} {{ $solicitud->apellido }}
+                </a>
+              </div>
+
+              <div class="appointment-request-info">
+                <span class="appointment-request-label">Fecha solicitada</span>
+                <span class="appointment-request-value">{{ $solicitud->fecha }}</span>
+              </div>
+
+              <div class="appointment-request-info">
+                <span class="appointment-request-label">Hora tentativa</span>
+                <span class="appointment-request-value">{{ $solicitud->hora }}</span>
+              </div>
+
+              <div class="appointment-request-info">
+                <span class="appointment-request-label">Motivo</span>
+                <span class="appointment-request-value appointment-request-reason">{{ $motivo }}</span>
+              </div>
+
             </div>
-          @endif
 
-          <div class="table-wrap">
+            <div class="appointment-actions">
 
-            <table
-              class="table"
-              aria-label="Tabla de citas pendientes por confirmar"
-            >
+              <!-- ACEPTAR CITA -->
+              <form
+                class="appointment-accept-form"
+                action="/citas/{{ $solicitud->id }}/aceptar"
+                method="POST"
+              >
+                @csrf
 
-              <thead>
-                <tr>
-                  <th>Paciente</th>
-                  <th>Fecha solicitada</th>
-                  <th>Hora tentativa</th>
-                  <th>Motivo / descripción</th>
-                  <th>Acciones</th>
-                </tr>
-              </thead>
+                <button
+                  class="btn-accept"
+                  type="submit"
+                >
+                  Aceptar
+                </button>
 
-              <tbody>
+              </form>
 
-                @forelse ($solicitudes as $solicitud)
+              <!-- RECHAZAR CITA -->
+              <form
+                class="appointment-reject-form"
+                action="/citas/{{ $solicitud->id }}/rechazar"
+                method="POST"
+              >
+                @csrf
 
-                  <tr>
+                <label
+                  class="comment-label"
+                  for="comentario-{{ $solicitud->id }}"
+                >
+                  Comentario opcional
+                </label>
 
-                    <td data-label="Paciente">
-                      <a
-                        class="table__link"
-                        href="/expediente/{{ $solicitud->paciente_id }}"
-                      >
-                        {{ $solicitud->nombre }} {{ $solicitud->apellido }}
-                      </a>
-                    </td>
+                <div class="appointment-actions-row">
 
-                    <td data-label="Fecha solicitada">
-                      {{ $solicitud->fecha }}
-                    </td>
+                  <input
+                    id="comentario-{{ $solicitud->id }}"
+                    class="comment-input"
+                    type="text"
+                    name="comentario"
+                    placeholder="Comentario opcional"
+                  />
 
-                    <td data-label="Hora tentativa">
-                      {{ $solicitud->hora }}
-                    </td>
+                  <button
+                    class="btn-reject"
+                    type="submit"
+                  >
+                    Rechazar
+                  </button>
 
-                    <td data-label="Motivo">
-                      @php
-                        try {
-                            echo \Illuminate\Support\Facades\Crypt::decryptString($solicitud->motivo);
-                        } catch (\Exception $e) {
-                            echo $solicitud->motivo;
-                        }
-                      @endphp
-                    </td>
+                </div>
 
-                    <td data-label="Acciones">
+              </form>
 
-                      <div class="actions">
+            </div>
 
-                        <!-- ACEPTAR CITA -->
-                        <form
-                          action="/citas/{{ $solicitud->id }}/aceptar"
-                          method="POST"
-                        >
-                          @csrf
+          </article>
 
-                          <button
-                            class="btn btn--accept"
-                            type="submit"
-                          >
-                            Aceptar
-                          </button>
+        @empty
 
-                        </form>
+          <article class="appointment-request-card appointment-request-card--empty">
+            No tienes citas pendientes por confirmar.
+          </article>
 
-
-                        <!-- RECHAZAR CITA -->
-                        <form
-                          action="/citas/{{ $solicitud->id }}/rechazar"
-                          method="POST"
-                        >
-                          @csrf
-
-                          <div class="comment">
-
-                            <input
-                              class="comment__input"
-                              type="text"
-                              name="comentario"
-                              placeholder="Comentario opcional"
-                            />
-
-                            <button
-                              class="btn btn--reject"
-                              type="submit"
-                            >
-                              Rechazar
-                            </button>
-
-                          </div>
-
-                        </form>
-
-                      </div>
-
-                    </td>
-
-                  </tr>
-
-                @empty
-
-                  <tr>
-                    <td
-                      colspan="5"
-                      style="text-align:center;"
-                    >
-                      No tienes citas pendientes por confirmar.
-                    </td>
-                  </tr>
-
-                @endforelse
-
-              </tbody>
-
-            </table>
-
-          </div>
-
-        </article>
+        @endforelse
 
       </section>
 

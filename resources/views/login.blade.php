@@ -13,6 +13,8 @@
     <!-- Responsive design -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
     <!-- CSS cargado desde public/css -->
     <link rel="stylesheet" href="{{ asset('css/login.css') }}">
 
@@ -248,6 +250,16 @@
                     Entrar
                 </button>
 
+                <div class="form__divider">
+                    <span></span>
+                    <small>o</small>
+                    <span></span>
+                </div>
+
+                <button class="button button--google" id="googleLoginButton" type="button">
+                    Iniciar sesión con Google
+                </button>
+
 
                 <!-- ===================================== -->
                 <!-- FOOTER -->
@@ -269,6 +281,33 @@
         </section>
 
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        const supabaseUrl = @json($supabaseUrl);
+        const supabaseAnonKey = @json($supabaseAnonKey);
+        const googleLoginRedirectTo = @json($googleLoginRedirectTo);
+        const googleLoginButton = document.getElementById('googleLoginButton');
+        const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseAnonKey);
+
+        googleLoginButton.addEventListener('click', async () => {
+            googleLoginButton.disabled = true;
+            googleLoginButton.textContent = 'Conectando con Google...';
+
+            const { error } = await supabaseClient.auth.signInWithOAuth({
+                provider: 'google',
+                options: {
+                    redirectTo: googleLoginRedirectTo,
+                },
+            });
+
+            if (error) {
+                googleLoginButton.disabled = false;
+                googleLoginButton.textContent = 'Iniciar sesión con Google';
+                alert('No se pudo iniciar sesión con Google. Intenta nuevamente.');
+            }
+        });
+    </script>
 
 </body>
 

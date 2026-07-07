@@ -129,10 +129,11 @@
                     <p>
                       <strong>Tema a tratar:</strong>
                       @php
+                        $motivoCifrado = $cita->motivo_encrypted ?? $cita->motivo ?? null;
                         try {
-                            echo \Illuminate\Support\Facades\Crypt::decryptString($cita->motivo);
+                            echo $motivoCifrado ? \Illuminate\Support\Facades\Crypt::decryptString($motivoCifrado) : 'Sin registro';
                         } catch (\Exception $e) {
-                            echo $cita->motivo;
+                            echo 'No se pudo mostrar este dato.';
                         }
                       @endphp
                     </p>

@@ -45,7 +45,7 @@
                         Mi cuenta
                     </button>
                     <div class="dropdown__menu" id="dropdownMenu">
-                        <a class="dropdown__item" href="#">Mis datos</a>
+                        <a class="dropdown__item" href="/terapeuta/mis-datos">Mis datos</a>
                         <a class="dropdown__item" href="/logout">Cerrar sesión</a>
                     </div>
                 </div>
@@ -74,51 +74,52 @@
             <!-- PRÓXIMAS CITAS -->
             <section class="content">
                 <h2 class="title">Próximas citas</h2>
-                <article class="card">
+                <article class="card clinical-table-card">
                     <p class="card__description" style="margin-bottom: 12px;">
                         Aquí verás las próximas citas agendadas por tus pacientes.
                     </p>
 
-                    <div class="table-wrap">
-                        <table class="table" aria-label="Tabla de próximas citas">
+                    <div class="table-wrap clinical-table-wrap">
+                        <table class="table clinical-table clinical-table--appointments" aria-label="Tabla de próximas citas">
                             <thead>
                                 <tr>
                                     <th>Paciente</th>
-                                    <th>Fecha</th>
-                                    <th>Hora</th>
+                                    <th class="cell-center">Fecha</th>
+                                    <th class="cell-center">Hora</th>
                                     <th>Motivo / descripción</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 @forelse ($proximasCitas as $cita)
                                     <tr>
-                                        <td data-label="Paciente">
+                                        <td class="cell-patient" data-label="Paciente">
                                             <a class="table__link" href="/expediente/{{ $cita->paciente_id }}">
                                                 {{ $cita->nombre }} {{ $cita->apellido }}
                                             </a>
                                         </td>
 
-                                        <td data-label="Fecha">
+                                        <td class="cell-center cell-nowrap" data-label="Fecha">
                                             {{ \Carbon\Carbon::parse($cita->fecha)->format('d/m/Y') }}
                                         </td>
 
-                                        <td data-label="Hora">
+                                        <td class="cell-center cell-nowrap" data-label="Hora">
                                             {{ \Carbon\Carbon::parse($cita->hora)->format('H:i') }}
                                         </td>
 
-                                        <td data-label="Motivo">
+                                        <td class="cell-text" data-label="Motivo">
                                             @php
+                                                $motivoCifrado = $cita->motivo_encrypted ?? $cita->motivo ?? null;
                                                 try {
-                                                    echo \Illuminate\Support\Facades\Crypt::decryptString($cita->motivo);
+                                                    echo $motivoCifrado ? \Illuminate\Support\Facades\Crypt::decryptString($motivoCifrado) : 'Sin registro';
                                                 } catch (\Exception $e) {
-                                                    echo $cita->motivo;
+                                                    echo 'No se pudo mostrar este dato.';
                                                 }
                                             @endphp
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="4" style="text-align:center;">
+                                        <td class="table-empty-state" colspan="4">
                                             No tienes próximas citas confirmadas.
                                         </td>
                                     </tr>

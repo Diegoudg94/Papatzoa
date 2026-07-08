@@ -79,5 +79,6 @@
       showError('Ocurrió un error inesperado durante el inicio de sesión con Google.');
     });
   </script>
+@include('partials.marker-widget')
 </body>
 </html>

@@ -101,5 +101,6 @@
       showError('Ocurrió un error inesperado durante el registro con Google.');
     });
   </script>
+@include('partials.marker-widget')
 </body>
 </html>

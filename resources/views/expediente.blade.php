@@ -457,5 +457,6 @@
     });
   </script>
 
+@include('partials.marker-widget')
 </body>
 </html>

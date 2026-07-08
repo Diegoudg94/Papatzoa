@@ -132,7 +132,7 @@ Route::post('/completar-registro-google', function (Request $request) {
     $request->validate([
         'nombre' => 'required|string|max:255',
         'edad' => 'required|integer|min:10|max:120',
-        'sexo' => 'required|string|in:masculino,femenino,otro,prefiero_no_decir',
+        'sexo' => 'required|string|in:masculino,femenino,no-binario,otro,prefiero_no_decir',
         'terapeuta' => 'required|boolean',
     ]);
 

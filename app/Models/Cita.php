@@ -14,10 +14,30 @@ class Cita extends Model
         'terapeuta_id',
         'fecha',
         'hora',
+        'motivo',
         'motivo_encrypted',
         'estado',
         'comentario_terapeuta',
+        'starts_at',
+        'ends_at',
+        'timezone',
+        'duration_minutes',
+        'modalidad',
+        'requested_at',
+        'confirmed_at',
+        'cancelled_at',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'starts_at' => 'datetime',
+            'ends_at' => 'datetime',
+            'requested_at' => 'datetime',
+            'confirmed_at' => 'datetime',
+            'cancelled_at' => 'datetime',
+        ];
+    }
 
     public function paciente(): BelongsTo
     {

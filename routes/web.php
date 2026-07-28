@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Http\Controllers\UsuarioController;
+use App\Http\Controllers\TherapistAvailabilityController;
+use App\Http\Controllers\PatientAppointmentController;
 use App\Models\Cita;
 use App\Models\DiarioEmocion;
 use App\Models\NotaTerapeuta;
@@ -275,6 +277,28 @@ Route::post('/login/google/validar', function (Request $request) {
 
 Route::get('/logout', [UsuarioController::class, 'logout']);
 
+Route::get('/terapeuta/disponibilidad', [TherapistAvailabilityController::class, 'index'])
+    ->name('therapist.availability.index');
+Route::post('/terapeuta/disponibilidad/configuracion', [TherapistAvailabilityController::class, 'updateSettings'])
+    ->name('therapist.availability.settings.update');
+Route::post('/terapeuta/disponibilidad/horarios', [TherapistAvailabilityController::class, 'storeRule'])
+    ->name('therapist.availability.rules.store');
+Route::put('/terapeuta/disponibilidad/horarios/{id}', [TherapistAvailabilityController::class, 'updateRule'])
+    ->whereNumber('id')
+    ->name('therapist.availability.rules.update');
+Route::delete('/terapeuta/disponibilidad/horarios/{id}', [TherapistAvailabilityController::class, 'destroyRule'])
+    ->whereNumber('id')
+    ->name('therapist.availability.rules.destroy');
+Route::post('/terapeuta/disponibilidad/excepciones', [TherapistAvailabilityController::class, 'storeException'])
+    ->name('therapist.availability.exceptions.store');
+Route::delete('/terapeuta/disponibilidad/excepciones/{id}', [TherapistAvailabilityController::class, 'destroyException'])
+    ->whereNumber('id')
+    ->name('therapist.availability.exceptions.destroy');
+Route::get('/terapeuta/disponibilidad/vista-previa', [TherapistAvailabilityController::class, 'preview'])
+    ->name('therapist.availability.preview');
+Route::get('/citas/disponibilidad', [PatientAppointmentController::class, 'availability'])
+    ->name('patient.appointments.availability');
+
 
 /*
 |--------------------------------------------------------------------------
@@ -346,22 +370,7 @@ Route::get('/dashboard', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::get('/citas', function () {
-
-    $usuarioId = session('usuario_id');
-
-    if (!$usuarioId) {
-        return redirect('/login');
-    }
-
-    $citas = DB::table('citas')
-        ->where('paciente_id', $usuarioId)
-        ->orderBy('created_at', 'desc')
-        ->get();
-
-    return view('citas', compact('citas'));
-
-});
+Route::get('/citas', [PatientAppointmentController::class, 'index']);
 
 
 /*
@@ -370,51 +379,7 @@ Route::get('/citas', function () {
 |--------------------------------------------------------------------------
 */
 
-Route::post('/citas/solicitar', function (Request $request) {
-
-    $request->validate([
-        'fecha' => 'required|date',
-        'hora' => 'required',
-        'motivo' => 'required|string',
-    ]);
-
-    $usuarioId = session('usuario_id');
-
-    if (!$usuarioId) {
-        return redirect('/login');
-    }
-
-    $paciente = DB::table('users')
-        ->where('id', $usuarioId)
-        ->first();
-
-    if (!$paciente || !$paciente->terapeuta_id) {
-        return redirect('/citas')
-            ->with(
-                'error_cita',
-                'Primero debes vincularte con un terapeuta para solicitar una cita.'
-            );
-    }
-
-    DB::table('citas')->insert([
-        'paciente_id' => $paciente->id,
-        'terapeuta_id' => $paciente->terapeuta_id,
-        'fecha' => $request->fecha,
-        'hora' => $request->hora,
-        'motivo_encrypted' => Crypt::encryptString($request->motivo),
-        'estado' => 'pendiente',
-        'comentario_terapeuta' => null,
-        'created_at' => now(),
-        'updated_at' => now(),
-    ]);
-
-    return redirect('/citas')
-        ->with(
-            'success_cita',
-            'Tu solicitud de cita fue enviada. El terapeuta la confirmará en cuanto sea posible.'
-        );
-
-});
+Route::post('/citas/solicitar', [PatientAppointmentController::class, 'store']);
 
 
 /*
@@ -824,17 +789,21 @@ Route::get('/terapeuta', function () {
             $query->where('citas.terapeuta_id', (int) $terapeutaId)
                   ->orWhere('citas.terapeuta_id', (string) $terapeutaId);
         })
-        ->where('citas.estado', 'aceptada')
+        ->whereIn('citas.estado', ['aceptada', 'aceptado', 'confirmada', 'confirmado'])
         ->select(
             'citas.id',
             'citas.fecha',
             'citas.hora',
+            'citas.starts_at',
+            'citas.ends_at',
+            'citas.timezone',
+            'citas.modalidad',
             'citas.motivo_encrypted',
             'users.id as paciente_id',
             'users.nombre',
             'users.apellido'
         )
-        ->orderBy('citas.fecha', 'asc')
+        ->orderByRaw('COALESCE(citas.starts_at, citas.fecha::timestamp) ASC')
         ->orderBy('citas.hora', 'asc')
         ->get();
 
@@ -877,6 +846,10 @@ Route::get('/confirmar', function () {
     'citas.id',
     'citas.fecha',
     'citas.hora',
+    'citas.starts_at',
+    'citas.ends_at',
+    'citas.timezone',
+    'citas.modalidad',
     'citas.motivo_encrypted',
     'citas.estado',
     'users.id as paciente_id',
@@ -905,16 +878,47 @@ Route::post('/citas/{id}/aceptar', function ($id) {
         return redirect('/login');
     }
 
-    DB::table('citas')
-        ->where('id', $id)
-        ->where(function ($query) use ($terapeutaId) {
-            $query->where('terapeuta_id', (int) $terapeutaId)
-                  ->orWhere('terapeuta_id', (string) $terapeutaId);
-        })
-        ->update([
-            'estado' => 'aceptada',
-            'updated_at' => now(),
-        ]);
+    try {
+        DB::transaction(function () use ($id, $terapeutaId) {
+            $cita = Cita::query()
+                ->where('id', $id)
+                ->where(function ($query) use ($terapeutaId) {
+                    $query->where('terapeuta_id', (int) $terapeutaId)
+                          ->orWhere('terapeuta_id', (string) $terapeutaId);
+                })
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($cita->starts_at && $cita->ends_at) {
+                $conflict = Cita::query()
+                    ->where('terapeuta_id', $cita->terapeuta_id)
+                    ->whereKeyNot($cita->id)
+                    ->whereIn('estado', ['pendiente', 'confirmada', 'confirmado', 'aceptada', 'aceptado'])
+                    ->whereNotNull('starts_at')
+                    ->whereNotNull('ends_at')
+                    ->where('starts_at', '<', $cita->ends_at)
+                    ->where('ends_at', '>', $cita->starts_at)
+                    ->lockForUpdate()
+                    ->exists();
+
+                if ($conflict) {
+                    throw new \RuntimeException('slot_ocupado');
+                }
+            }
+
+            $cita->update([
+                'estado' => 'confirmada',
+                'confirmed_at' => now(),
+            ]);
+        });
+    } catch (\RuntimeException $exception) {
+        if ($exception->getMessage() === 'slot_ocupado') {
+            return redirect('/confirmar')
+                ->with('error_confirmar', 'Este horario ya fue ocupado por otra cita.');
+        }
+
+        throw $exception;
+    }
 
     return redirect('/confirmar')
         ->with('success_confirmar', 'Cita aceptada correctamente.');
@@ -951,6 +955,7 @@ Route::post('/citas/{id}/rechazar', function (Request $request, $id) {
         ->update([
             'estado' => 'rechazada',
             'comentario_terapeuta' => $comentario,
+            'cancelled_at' => null,
             'updated_at' => now(),
         ]);
 

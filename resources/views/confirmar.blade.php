@@ -96,6 +96,12 @@
         </div>
       @endif
 
+      @if (session('error_confirmar'))
+        <div class="confirmar-citas-alert" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5;">
+          {{ session('error_confirmar') }}
+        </div>
+      @endif
+
       <section
         class="appointment-request-list"
         aria-label="Solicitudes de citas pendientes por confirmar"
@@ -105,6 +111,9 @@
 
           @php
             $motivoCifrado = $solicitud->motivo_encrypted ?? $solicitud->motivo ?? null;
+            $inicioSolicitud = $solicitud->starts_at
+                ? \Carbon\Carbon::parse($solicitud->starts_at)->setTimezone($solicitud->timezone ?: 'America/Mexico_City')
+                : \Carbon\Carbon::parse(($solicitud->fecha ?? now()->toDateString()) . ' ' . ($solicitud->hora ?: '00:00'));
 
             try {
                 $motivo = $motivoCifrado
@@ -132,12 +141,12 @@
 
               <div class="appointment-request-info">
                 <span class="appointment-request-label">Fecha solicitada</span>
-                <span class="appointment-request-value">{{ $solicitud->fecha }}</span>
+                <span class="appointment-request-value">{{ $inicioSolicitud->format('d/m/Y') }}</span>
               </div>
 
               <div class="appointment-request-info">
-                <span class="appointment-request-label">Hora tentativa</span>
-                <span class="appointment-request-value">{{ $solicitud->hora }}</span>
+                <span class="appointment-request-label">Hora</span>
+                <span class="appointment-request-value">{{ $inicioSolicitud->format('H:i') }}</span>
               </div>
 
               <div class="appointment-request-info">

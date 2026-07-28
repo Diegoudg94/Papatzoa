@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -39,6 +40,26 @@ class User extends Authenticatable
     public function citasComoPaciente(): HasMany
     {
         return $this->hasMany(Cita::class, 'paciente_id');
+    }
+
+    public function citasComoTerapeuta(): HasMany
+    {
+        return $this->hasMany(Cita::class, 'terapeuta_id');
+    }
+
+    public function availabilitySetting(): HasOne
+    {
+        return $this->hasOne(TherapistAvailabilitySetting::class, 'therapist_id');
+    }
+
+    public function availabilityRules(): HasMany
+    {
+        return $this->hasMany(TherapistAvailabilityRule::class, 'therapist_id');
+    }
+
+    public function availabilityExceptions(): HasMany
+    {
+        return $this->hasMany(TherapistAvailabilityException::class, 'therapist_id');
     }
 
     public function notasComoPaciente(): HasMany
